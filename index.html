@@ -83,92 +83,92 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <main>
   <div class="hero">
-    <h1>Free, private developer tools</h1>
-    <p>Everything runs in your browser. No signup, nothing uploaded.</p>
+    <h1 id="heroH1">Free, private developer tools</h1>
+    <p id="heroP">Everything runs in your browser. No signup, nothing uploaded.</p>
     <input type="text" class="search-box" id="searchBox" placeholder="Search tools... (e.g. json, hash, uuid)">
   </div>
 
   <div class="category" data-cat="format">
-    <div class="category-title">Format</div>
+    <div class="category-title" id="catFormat">Format</div>
     <div class="card-grid">
       <a href="code-formatter.html" class="tool-card" data-name="formatter json html javascript css">
         <div class="tool-card-icon">{ }</div>
-        <div class="tool-card-name">Code Formatter</div>
-        <div class="tool-card-desc">JSON, HTML, JavaScript &amp; CSS — format, minify, validate</div>
+        <div class="tool-card-name" id="cardFormatterName">Code Formatter</div>
+        <div class="tool-card-desc" id="cardFormatterDesc">JSON, HTML, JavaScript &amp; CSS — format, minify, validate</div>
       </a>
       <a href="yaml-json.html" class="tool-card" data-name="yaml json converter">
         <div class="tool-card-icon">⇄</div>
-        <div class="tool-card-name">YAML ↔ JSON</div>
-        <div class="tool-card-desc">Convert between YAML and JSON instantly</div>
+        <div class="tool-card-name" id="cardYamlName">YAML ↔ JSON</div>
+        <div class="tool-card-desc" id="cardYamlDesc">Convert between YAML and JSON instantly</div>
       </a>
     </div>
   </div>
 
   <div class="category" data-cat="encode">
-    <div class="category-title">Encode / Decode</div>
+    <div class="category-title" id="catEncode">Encode / Decode</div>
     <div class="card-grid">
       <a href="base64-tool.html" class="tool-card" data-name="base64 encode decode">
         <div class="tool-card-icon">64</div>
-        <div class="tool-card-name">Base64</div>
-        <div class="tool-card-desc">Encode or decode Base64 text</div>
+        <div class="tool-card-name" id="cardBase64Name">Base64</div>
+        <div class="tool-card-desc" id="cardBase64Desc">Encode or decode Base64 text</div>
       </a>
       <a href="url-encoder.html" class="tool-card" data-name="url encode decode percent">
         <div class="tool-card-icon">%</div>
-        <div class="tool-card-name">URL Encoder</div>
-        <div class="tool-card-desc">Percent-encode or decode URLs</div>
+        <div class="tool-card-name" id="cardUrlName">URL Encoder</div>
+        <div class="tool-card-desc" id="cardUrlDesc">Percent-encode or decode URLs</div>
       </a>
       <a href="jwt-decoder.html" class="tool-card" data-name="jwt decoder token debugger">
         <div class="tool-card-icon">⚿</div>
-        <div class="tool-card-name">JWT Decoder</div>
-        <div class="tool-card-desc">Decode a JWT's header and payload</div>
+        <div class="tool-card-name" id="cardJwtName">JWT Decoder</div>
+        <div class="tool-card-desc" id="cardJwtDesc">Decode a JWT's header and payload</div>
       </a>
     </div>
   </div>
 
   <div class="category" data-cat="generate">
-    <div class="category-title">Generate</div>
+    <div class="category-title" id="catGenerate">Generate</div>
     <div class="card-grid">
       <a href="hash-generator.html" class="tool-card" data-name="hash md5 sha generator">
         <div class="tool-card-icon">#</div>
-        <div class="tool-card-name">Hash Generator</div>
-        <div class="tool-card-desc">MD5, SHA-1, SHA-256, SHA-384, SHA-512</div>
+        <div class="tool-card-name" id="cardHashName">Hash Generator</div>
+        <div class="tool-card-desc" id="cardHashDesc">MD5, SHA-1, SHA-256, SHA-384, SHA-512</div>
       </a>
       <a href="uuid-generator.html" class="tool-card" data-name="uuid ulid generator id">
         <div class="tool-card-icon">◇</div>
-        <div class="tool-card-name">UUID / ULID Generator</div>
-        <div class="tool-card-desc">Generate unique identifiers in bulk</div>
+        <div class="tool-card-name" id="cardUuidName">UUID / ULID Generator</div>
+        <div class="tool-card-desc" id="cardUuidDesc">Generate unique identifiers in bulk</div>
       </a>
     </div>
   </div>
 
   <div class="category" data-cat="convert">
-    <div class="category-title">Convert</div>
+    <div class="category-title" id="catConvert">Convert</div>
     <div class="card-grid">
       <a href="unix-timestamp.html" class="tool-card" data-name="unix timestamp date converter">
         <div class="tool-card-icon">🕐</div>
-        <div class="tool-card-name">Unix Timestamp</div>
-        <div class="tool-card-desc">Convert timestamps to dates and back</div>
+        <div class="tool-card-name" id="cardTimestampName">Unix Timestamp</div>
+        <div class="tool-card-desc" id="cardTimestampDesc">Convert timestamps to dates and back</div>
       </a>
       <a href="color-converter.html" class="tool-card" data-name="color hex rgb hsl converter">
         <div class="tool-card-icon">🎨</div>
-        <div class="tool-card-name">Color Converter</div>
-        <div class="tool-card-desc">Convert between HEX, RGB, and HSL</div>
+        <div class="tool-card-name" id="cardColorName">Color Converter</div>
+        <div class="tool-card-desc" id="cardColorDesc">Convert between HEX, RGB, and HSL</div>
       </a>
       <a href="curl-converter.html" class="tool-card" data-name="curl converter python javascript code">
         <div class="tool-card-icon">⌘</div>
-        <div class="tool-card-name">Curl Converter</div>
-        <div class="tool-card-desc">Turn a curl command into Python, JS, Go, and 7 more languages</div>
+        <div class="tool-card-name" id="cardCurlName">Curl Converter</div>
+        <div class="tool-card-desc" id="cardCurlDesc">Turn a curl command into Python, JS, Go, and 7 more languages</div>
       </a>
     </div>
   </div>
 
   <div class="category" data-cat="test">
-    <div class="category-title">Test</div>
+    <div class="category-title" id="catTest">Test</div>
     <div class="card-grid">
       <a href="regex-tester.html" class="tool-card" data-name="regex tester regular expression">
         <div class="tool-card-icon">.*</div>
-        <div class="tool-card-name">Regex Tester</div>
-        <div class="tool-card-desc">Test regular expressions with live highlighting</div>
+        <div class="tool-card-name" id="cardRegexName">Regex Tester</div>
+        <div class="tool-card-desc" id="cardRegexDesc">Test regular expressions with live highlighting</div>
       </a>
     </div>
   </div>
@@ -176,8 +176,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <div class="site-footer">
   <span>© 2026 DevWright</span>
-  <a href="index.html#privacy">Privacy Policy</a>
-  <a href="index.html#terms">Terms of Service</a>
+  <a href="index.html#privacy" id="footerPrivacy">Privacy Policy</a>
+  <a href="index.html#terms" id="footerTerms">Terms of Service</a>
 </div>
 
 <script src="site.js"></script>
@@ -185,6 +185,143 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   const themeToggle = document.getElementById('themeToggle');
   const uiLangSelect = document.getElementById('uiLangSelect');
   const searchBox = document.getElementById('searchBox');
+
+  const heroH1 = document.getElementById('heroH1');
+  const heroP = document.getElementById('heroP');
+  const catFormat = document.getElementById('catFormat');
+  const catEncode = document.getElementById('catEncode');
+  const catGenerate = document.getElementById('catGenerate');
+  const catConvert = document.getElementById('catConvert');
+  const catTest = document.getElementById('catTest');
+  const cardFormatterName = document.getElementById('cardFormatterName');
+  const cardFormatterDesc = document.getElementById('cardFormatterDesc');
+  const cardYamlName = document.getElementById('cardYamlName');
+  const cardYamlDesc = document.getElementById('cardYamlDesc');
+  const cardBase64Name = document.getElementById('cardBase64Name');
+  const cardBase64Desc = document.getElementById('cardBase64Desc');
+  const cardUrlName = document.getElementById('cardUrlName');
+  const cardUrlDesc = document.getElementById('cardUrlDesc');
+  const cardJwtName = document.getElementById('cardJwtName');
+  const cardJwtDesc = document.getElementById('cardJwtDesc');
+  const cardHashName = document.getElementById('cardHashName');
+  const cardHashDesc = document.getElementById('cardHashDesc');
+  const cardUuidName = document.getElementById('cardUuidName');
+  const cardUuidDesc = document.getElementById('cardUuidDesc');
+  const cardTimestampName = document.getElementById('cardTimestampName');
+  const cardTimestampDesc = document.getElementById('cardTimestampDesc');
+  const cardColorName = document.getElementById('cardColorName');
+  const cardColorDesc = document.getElementById('cardColorDesc');
+  const cardCurlName = document.getElementById('cardCurlName');
+  const cardCurlDesc = document.getElementById('cardCurlDesc');
+  const cardRegexName = document.getElementById('cardRegexName');
+  const cardRegexDesc = document.getElementById('cardRegexDesc');
+  const footerPrivacy = document.getElementById('footerPrivacy');
+  const footerTerms = document.getElementById('footerTerms');
+
+  const translations = {
+    en: {
+      heroH1: 'Free, private developer tools',
+      heroP: 'Everything runs in your browser. No signup, nothing uploaded.',
+      searchPlaceholder: 'Search tools... (e.g. json, hash, uuid)',
+      catFormat: 'Format', catEncode: 'Encode / Decode', catGenerate: 'Generate',
+      catConvert: 'Convert', catTest: 'Test',
+      formatterName: 'Code Formatter', formatterDesc: 'JSON, HTML, JavaScript & CSS — format, minify, validate',
+      yamlName: 'YAML ↔ JSON', yamlDesc: 'Convert between YAML and JSON instantly',
+      base64Name: 'Base64', base64Desc: 'Encode or decode Base64 text',
+      urlName: 'URL Encoder', urlDesc: 'Percent-encode or decode URLs',
+      jwtName: 'JWT Decoder', jwtDesc: "Decode a JWT's header and payload",
+      hashName: 'Hash Generator', hashDesc: 'MD5, SHA-1, SHA-256, SHA-384, SHA-512',
+      uuidName: 'UUID / ULID Generator', uuidDesc: 'Generate unique identifiers in bulk',
+      timestampName: 'Unix Timestamp', timestampDesc: 'Convert timestamps to dates and back',
+      colorName: 'Color Converter', colorDesc: 'Convert between HEX, RGB, and HSL',
+      curlName: 'Curl Converter', curlDesc: 'Turn a curl command into Python, JS, Go, and 7 more languages',
+      regexName: 'Regex Tester', regexDesc: 'Test regular expressions with live highlighting',
+      footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service'
+    },
+    zh: {
+      heroH1: '免费、私密的开发者工具',
+      heroP: '一切都在您的浏览器中运行。无需注册，不上传任何内容。',
+      searchPlaceholder: '搜索工具...（例如 json、hash、uuid）',
+      catFormat: '格式化', catEncode: '编码 / 解码', catGenerate: '生成',
+      catConvert: '转换', catTest: '测试',
+      formatterName: '代码格式化', formatterDesc: 'JSON、HTML、JavaScript 和 CSS — 格式化、压缩、校验',
+      yamlName: 'YAML ↔ JSON', yamlDesc: '即时在 YAML 和 JSON 之间转换',
+      base64Name: 'Base64', base64Desc: '编码或解码 Base64 文本',
+      urlName: 'URL 编码器', urlDesc: '对 URL 进行百分号编码或解码',
+      jwtName: 'JWT 解码器', jwtDesc: '解码 JWT 的头部和载荷',
+      hashName: '哈希生成器', hashDesc: 'MD5、SHA-1、SHA-256、SHA-384、SHA-512',
+      uuidName: 'UUID / ULID 生成器', uuidDesc: '批量生成唯一标识符',
+      timestampName: 'Unix 时间戳', timestampDesc: '在时间戳和日期之间转换',
+      colorName: '颜色转换器', colorDesc: '在 HEX、RGB 和 HSL 之间转换',
+      curlName: 'Curl 转换器', curlDesc: '将 curl 命令转换为 Python、JS、Go 等 7 种以上语言',
+      regexName: '正则测试器', regexDesc: '实时高亮测试正则表达式',
+      footerPrivacy: '隐私政策', footerTerms: '服务条款'
+    },
+    ja: {
+      heroH1: '無料でプライベートな開発者ツール',
+      heroP: 'すべてブラウザ内で完結します。登録不要、アップロードなし。',
+      searchPlaceholder: 'ツールを検索...（例: json、hash、uuid）',
+      catFormat: 'フォーマット', catEncode: 'エンコード / デコード', catGenerate: '生成',
+      catConvert: '変換', catTest: 'テスト',
+      formatterName: 'コードフォーマッター', formatterDesc: 'JSON、HTML、JavaScript、CSS — 整形・圧縮・検証',
+      yamlName: 'YAML ↔ JSON', yamlDesc: 'YAML と JSON を即座に相互変換',
+      base64Name: 'Base64', base64Desc: 'Base64 のエンコード・デコード',
+      urlName: 'URL エンコーダー', urlDesc: 'URL のパーセントエンコード・デコード',
+      jwtName: 'JWT デコーダー', jwtDesc: 'JWT のヘッダーとペイロードをデコード',
+      hashName: 'ハッシュ生成器', hashDesc: 'MD5、SHA-1、SHA-256、SHA-384、SHA-512',
+      uuidName: 'UUID / ULID 生成器', uuidDesc: '一意の識別子を一括生成',
+      timestampName: 'Unix タイムスタンプ', timestampDesc: 'タイムスタンプと日付を相互変換',
+      colorName: 'カラーコンバーター', colorDesc: 'HEX、RGB、HSL を相互変換',
+      curlName: 'Curl コンバーター', curlDesc: 'curl コマンドを Python、JS、Go など7言語以上に変換',
+      regexName: '正規表現テスター', regexDesc: 'ライブハイライトで正規表現をテスト',
+      footerPrivacy: 'プライバシーポリシー', footerTerms: '利用規約'
+    },
+    ko: {
+      heroH1: '무료, 프라이빗한 개발자 도구',
+      heroP: '모든 처리가 브라우저 안에서 이뤄집니다. 회원가입도, 업로드도 없어요.',
+      searchPlaceholder: '도구 검색... (예: json, hash, uuid)',
+      catFormat: '포맷', catEncode: '인코딩 / 디코딩', catGenerate: '생성',
+      catConvert: '변환', catTest: '테스트',
+      formatterName: '코드 포맷터', formatterDesc: 'JSON, HTML, JavaScript, CSS — 포맷팅, 압축, 검증',
+      yamlName: 'YAML ↔ JSON', yamlDesc: 'YAML과 JSON을 즉시 상호 변환',
+      base64Name: 'Base64', base64Desc: 'Base64 텍스트 인코딩 또는 디코딩',
+      urlName: 'URL 인코더', urlDesc: 'URL 퍼센트 인코딩 또는 디코딩',
+      jwtName: 'JWT 디코더', jwtDesc: 'JWT의 헤더와 페이로드 디코딩',
+      hashName: '해시 생성기', hashDesc: 'MD5, SHA-1, SHA-256, SHA-384, SHA-512',
+      uuidName: 'UUID / ULID 생성기', uuidDesc: '고유 식별자를 대량으로 생성',
+      timestampName: 'Unix 타임스탬프', timestampDesc: '타임스탬프와 날짜를 상호 변환',
+      colorName: '색상 변환기', colorDesc: 'HEX, RGB, HSL 간 변환',
+      curlName: 'Curl 변환기', curlDesc: 'curl 명령어를 Python, JS, Go 등 7개 이상 언어로 변환',
+      regexName: '정규식 테스터', regexDesc: '실시간 하이라이트로 정규식 테스트',
+      footerPrivacy: '개인정보처리방침', footerTerms: '이용약관'
+    }
+  };
+
+  function applyLanguage(lang){
+    document.documentElement.lang = lang;
+    const dict = translations[lang];
+    heroH1.textContent = dict.heroH1;
+    heroP.textContent = dict.heroP;
+    searchBox.placeholder = dict.searchPlaceholder;
+    catFormat.textContent = dict.catFormat;
+    catEncode.textContent = dict.catEncode;
+    catGenerate.textContent = dict.catGenerate;
+    catConvert.textContent = dict.catConvert;
+    catTest.textContent = dict.catTest;
+    cardFormatterName.textContent = dict.formatterName; cardFormatterDesc.textContent = dict.formatterDesc;
+    cardYamlName.textContent = dict.yamlName; cardYamlDesc.textContent = dict.yamlDesc;
+    cardBase64Name.textContent = dict.base64Name; cardBase64Desc.textContent = dict.base64Desc;
+    cardUrlName.textContent = dict.urlName; cardUrlDesc.textContent = dict.urlDesc;
+    cardJwtName.textContent = dict.jwtName; cardJwtDesc.textContent = dict.jwtDesc;
+    cardHashName.textContent = dict.hashName; cardHashDesc.textContent = dict.hashDesc;
+    cardUuidName.textContent = dict.uuidName; cardUuidDesc.textContent = dict.uuidDesc;
+    cardTimestampName.textContent = dict.timestampName; cardTimestampDesc.textContent = dict.timestampDesc;
+    cardColorName.textContent = dict.colorName; cardColorDesc.textContent = dict.colorDesc;
+    cardCurlName.textContent = dict.curlName; cardCurlDesc.textContent = dict.curlDesc;
+    cardRegexName.textContent = dict.regexName; cardRegexDesc.textContent = dict.regexDesc;
+    footerPrivacy.textContent = dict.footerPrivacy;
+    footerTerms.textContent = dict.footerTerms;
+  }
 
   searchBox.addEventListener('input', () => {
     const q = searchBox.value.trim().toLowerCase();
@@ -199,8 +336,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   });
 
   DevWrightSite.setupThemeToggle(themeToggle, 'light');
-  uiLangSelect.value = DevWrightSite.getSharedLang('en');
-  uiLangSelect.addEventListener('change', (e) => DevWrightSite.saveSharedLang(e.target.value));
+  const initialLang = DevWrightSite.getSharedLang('en');
+  uiLangSelect.value = initialLang;
+  applyLanguage(initialLang);
+  uiLangSelect.addEventListener('change', (e) => {
+    DevWrightSite.saveSharedLang(e.target.value);
+    applyLanguage(e.target.value);
+  });
 </script>
 </body>
 </html>
