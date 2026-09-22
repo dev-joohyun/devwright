@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Online YAML to JSON Converter (and back)</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%94%A8</text></svg>">
+<meta name="description" content="Convert YAML to JSON or JSON to YAML instantly in your browser. Free, no signup, nothing leaves your device.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://dev-joohyun.github.io/devwright/yaml-json.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<link rel="stylesheet" href="site.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DevWright YAML \u2194 JSON Converter",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any (Web browser)",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free online tool to convert YAML to JSON or JSON to YAML."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What YAML features are supported?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Nested mappings and lists (block and flow style), strings, numbers, booleans, null, and comments. Advanced features like anchors, aliases, multi-document files, and block scalars (| or >) are not supported." }
+    },
+    {
+      "@type": "Question",
+      "name": "Why did my YAML fail to convert?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Usually inconsistent indentation, tabs instead of spaces, or an unsupported feature like anchors/aliases or block scalars. Try simplifying the file to a plain mapping/list structure." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my data sent to a server?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. The conversion happens entirely in your browser." }
+    }
+  ]
+}
+</script>
+<style>
+  main{ flex:1; display:flex; flex-direction:column; max-width:900px; margin:0 auto; width:100%; padding:32px 24px; gap:20px; }
+  h1{ font-size:18px; margin:0; }
+  .intro{ color:var(--muted); font-size:13px; margin:0; line-height:1.6; }
+
+  .mode-toggle{ display:flex; gap:4px; background:var(--panel); padding:4px; border-radius:8px; border:1px solid var(--border-strong); width:fit-content; }
+  .mode-btn{
+    padding:8px 18px; font-size:12.5px; font-weight:600; color:var(--muted); background:transparent;
+    border:none; border-radius:6px; cursor:pointer;
+  }
+  .mode-btn.active{ background:var(--panel-2); color:var(--text); box-shadow:inset 0 0 0 1px var(--border-strong); }
+
+  .field-label{ font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; }
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:700px){ .grid-2{ grid-template-columns:1fr; } }
+  textarea, .output-box{
+    width:100%; min-height:280px; resize:vertical; border:1px solid var(--line); border-radius:8px;
+    background:var(--panel); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:13px;
+    line-height:1.6; padding:14px 16px; overflow:auto; white-space:pre; tab-size:2;
+  }
+  textarea:focus{ outline:none; border-color:var(--border-hover); }
+  .output-box{ background:var(--panel-2); white-space:pre-wrap; word-break:break-word; }
+  .output-box.error{ color:var(--error); }
+
+  .actions{ display:flex; gap:10px; align-items:center; }
+  .icon-btn{
+    background:var(--panel-2); border:1px solid var(--border-strong); color:var(--muted);
+    font-size:12px; padding:8px 14px; border-radius:6px; cursor:pointer;
+  }
+  .icon-btn:hover{ color:var(--text); border-color:var(--border-hover); }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><a href="index.html"><span class="brand-mark">DevWright</span></a></div>
+    <div class="sidebar-group-label">Format</div>
+    <a href="code-formatter.html" class="sidebar-link">Code Formatter</a>
+    <a href="yaml-json.html" class="sidebar-link active" aria-current="page">YAML ↔ JSON</a>
+    <div class="sidebar-group-label">Encode / Decode</div>
+    <a href="base64-tool.html" class="sidebar-link">Base64</a>
+    <a href="url-encoder.html" class="sidebar-link">URL Encoder</a>
+    <a href="jwt-decoder.html" class="sidebar-link">JWT Decoder</a>
+    <div class="sidebar-group-label">Generate</div>
+    <a href="hash-generator.html" class="sidebar-link">Hash Generator</a>
+    <a href="uuid-generator.html" class="sidebar-link">UUID Generator</a>
+    <div class="sidebar-group-label">Convert</div>
+    <a href="unix-timestamp.html" class="sidebar-link">Unix Timestamp</a>
+    <a href="color-converter.html" class="sidebar-link">Color Converter</a>
+    <a href="curl-converter.html" class="sidebar-link">Curl Converter</a>
+    <div class="sidebar-group-label">Test</div>
+    <a href="regex-tester.html" class="sidebar-link">Regex Tester</a>
+  </aside>
+
+  <div class="content-col">
+<header>
+  <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle sidebar" title="Collapse sidebar">☰</button>
+  <div class="header-settings">
+    <select class="lang-select" id="uiLangSelect">
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+    </select>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main>
+  <h1 id="seoH1">Free Online YAML ↔ JSON Converter</h1>
+  <p class="intro" id="seoIntro">Convert YAML to JSON or JSON to YAML instantly. Runs entirely in your browser.</p>
+
+  <div class="mode-toggle" id="modeToggle">
+    <button class="mode-btn active" data-mode="yaml2json">YAML → JSON</button>
+    <button class="mode-btn" data-mode="json2yaml">JSON → YAML</button>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="field-label" id="inputLabel">YAML</div>
+      <textarea id="inputArea" placeholder="key: value"></textarea>
+    </div>
+    <div>
+      <div class="field-label" id="outputLabel">JSON</div>
+      <div class="output-box" id="outputBox"></div>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="icon-btn" id="copyBtn">Copy result</button>
+    <button class="icon-btn" id="clearBtn">Clear</button>
+  </div>
+
+  <details class="seo-more">
+    <summary id="seoToggle">FAQ</summary>
+    <h2 id="faqH2">Frequently asked questions</h2>
+    <details><summary id="faq1Q">What YAML features are supported?</summary><p id="faq1A">Nested mappings and lists (block and flow style), strings, numbers, booleans, null, and comments. Advanced features like anchors, aliases, multi-document files, and block scalars (| or &gt;) are not supported.</p></details>
+    <details><summary id="faq2Q">Why did my YAML fail to convert?</summary><p id="faq2A">Usually inconsistent indentation, tabs instead of spaces, or an unsupported feature like anchors/aliases or block scalars. Try simplifying the file to a plain mapping/list structure.</p></details>
+    <details><summary id="faq3Q">Is my data sent to a server?</summary><p id="faq3A">No. The conversion happens entirely in your browser.</p></details>
+  </details>
+</main>
+
+<div class="site-footer">
+  <span id="footerCopyright">© 2026 DevWright</span>
+  <a href="index.html#privacy" id="footerPrivacy">Privacy Policy</a>
+  <a href="index.html#terms" id="footerTerms">Terms of Service</a>
+</div>
+
+  </div>
+</div>
+
+<script src="site.js"></script>
+<script>
+// Minimal YAML (subset) <-> JSON converter.
+// Supports: nested mappings, sequences (block + flow), scalars (str/num/bool/null),
+// quoted strings, inline flow collections, comments, blank lines.
+// Does NOT support: anchors/aliases, multi-document streams, block scalars (| / >),
+// tags, complex keys. This covers the vast majority of everyday config-style YAML.
+
+function stripComment(line){
+  let inSingle = false, inDouble = false;
+  for(let i = 0; i < line.length; i++){
+    const c = line[i];
+    if(c === "'" && !inDouble) inSingle = !inSingle;
+    else if(c === '"' && !inSingle) inDouble = !inDouble;
+    else if(c === '#' && !inSingle && !inDouble){
+      if(i === 0 || /\s/.test(line[i-1])) return line.slice(0, i);
+    }
+  }
+  return line;
+}
+
+function coerceScalar(raw){
+  let s = raw.trim();
+  if(s === '' ) return null;
+  if(s === '~' || s === 'null' || s === 'Null' || s === 'NULL') return null;
+  if(s === 'true' || s === 'True' || s === 'TRUE') return true;
+  if(s === 'false' || s === 'False' || s === 'FALSE') return false;
+  if(/^"(?:\\.|[^"\\])*"$/.test(s)){
+    return JSON.parse(s);
+  }
+  if(/^'(?:[^']|'')*'$/.test(s)){
+    return s.slice(1, -1).replace(/''/g, "'");
+  }
+  if(/^-?\d+$/.test(s)) return parseInt(s, 10);
+  if(/^-?\d*\.\d+$/.test(s) || /^-?\d+\.\d*$/.test(s)) return parseFloat(s);
+  if(/^-?\d+(\.\d+)?e[+-]?\d+$/i.test(s)) return parseFloat(s);
+  if(s.startsWith('[') || s.startsWith('{')) return parseFlow(s);
+  return s;
+}
+
+// Parses a flow collection like [1, 2, "a"] or {a: 1, b: 2} (possibly nested).
+function parseFlow(s){
+  let i = 0;
+  function skipWs(){ while(i < s.length && /\s/.test(s[i])) i++; }
+  function parseValue(){
+    skipWs();
+    if(s[i] === '['){
+      i++;
+      const arr = [];
+      skipWs();
+      if(s[i] === ']'){ i++; return arr; }
+      while(true){
+        arr.push(parseValue());
+        skipWs();
+        if(s[i] === ','){ i++; continue; }
+        if(s[i] === ']'){ i++; break; }
+        throw new Error('Malformed flow sequence');
+      }
+      return arr;
+    }
+    if(s[i] === '{'){
+      i++;
+      const obj = {};
+      skipWs();
+      if(s[i] === '}'){ i++; return obj; }
+      while(true){
+        skipWs();
+        const key = parseScalarToken(true);
+        skipWs();
+        if(s[i] !== ':') throw new Error('Expected ":" in flow mapping');
+        i++;
+        const val = parseValue();
+        obj[key] = val;
+        skipWs();
+        if(s[i] === ','){ i++; continue; }
+        if(s[i] === '}'){ i++; break; }
+        throw new Error('Malformed flow mapping');
+      }
+      return obj;
+    }
+    return parseScalarToken(false);
+  }
+  function parseScalarToken(isKey){
+    skipWs();
+    if(s[i] === '"'){
+      let j = i + 1;
+      while(j < s.length && s[j] !== '"'){ if(s[j] === '\\') j++; j++; }
+      const raw = s.slice(i, j + 1);
+      i = j + 1;
+      return JSON.parse(raw);
+    }
+    if(s[i] === "'"){
+      let j = i + 1;
+      while(j < s.length){
+        if(s[j] === "'" && s[j+1] === "'"){ j += 2; continue; }
+        if(s[j] === "'") break;
+        j++;
+      }
+      const raw = s.slice(i + 1, j);
+      i = j + 1;
+      return raw.replace(/''/g, "'");
+    }
+    let j = i;
+    while(j < s.length && s[j] !== ',' && s[j] !== ']' && s[j] !== '}' && s[j] !== ':') j++;
+    const token = s.slice(i, j).trim();
+    i = j;
+    return coerceScalar(token);
+  }
+  const result = parseValue();
+  return result;
+}
+
+function splitKeyValue(line){
+  // Finds the top-level ": " (or trailing ":") that separates key from value,
+  // respecting quotes and flow brackets.
+  let depth = 0, inSingle = false, inDouble = false;
+  for(let i = 0; i < line.length; i++){
+    const c = line[i];
+    if(c === "'" && !inDouble) inSingle = !inSingle;
+    else if(c === '"' && !inSingle) inDouble = !inDouble;
+    else if(!inSingle && !inDouble){
+      if(c === '[' || c === '{') depth++;
+      else if(c === ']' || c === '}') depth--;
+      else if(c === ':' && depth === 0){
+        if(i + 1 === line.length || /\s/.test(line[i+1])){
+          return [line.slice(0, i), line.slice(i+1)];
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function yamlToJson(text){
+  const rawLines = text.split('\n');
+  const lines = [];
+  for(const raw of rawLines){
+    const noComment = stripComment(raw);
+    if(noComment.trim() === '') continue;
+    const indent = noComment.length - noComment.trimStart().length;
+    lines.push({ indent, content: noComment.trim(), raw: noComment });
+  }
+  let pos = 0;
+
+  function parseBlock(minIndent){
+    if(pos >= lines.length) return null;
+    const indent = lines[pos].indent;
+    if(indent < minIndent) return null;
+
+    if(lines[pos].content.startsWith('- ') || lines[pos].content === '-'){
+      return parseSequence(indent);
+    }
+    return parseMapping(indent);
+  }
+
+  function parseSequence(indent){
+    const arr = [];
+    while(pos < lines.length && lines[pos].indent === indent &&
+          (lines[pos].content === '-' || lines[pos].content.startsWith('- '))){
+      const content = lines[pos].content;
+      if(content === '-'){
+        pos++;
+        arr.push(parseBlock(indent + 1));
+      } else {
+        const rest = content.slice(2);
+        const kv = splitKeyValue(rest);
+        if(kv){
+          // "- key: value" starts an inline mapping; subsequent more-indented
+          // lines continue that same mapping item.
+          const savedContent = rest;
+          const virtualIndent = indent + 2; // position right after "- "
+          lines[pos] = { indent: virtualIndent, content: savedContent, raw: lines[pos].raw };
+          arr.push(parseMapping(virtualIndent));
+        } else {
+          pos++;
+          arr.push(coerceScalar(rest));
+        }
+      }
+    }
+    return arr;
+  }
+
+  function parseMapping(indent){
+    const obj = {};
+    while(pos < lines.length && lines[pos].indent === indent){
+      const content = lines[pos].content;
+      if(content.startsWith('- ') || content === '-') break;
+      const kv = splitKeyValue(content);
+      if(!kv) throw new Error('Expected "key: value" at: ' + content);
+      let [rawKey, rawVal] = kv;
+      const key = coerceScalar(rawKey.trim());
+      rawVal = rawVal.trim();
+      pos++;
+      if(rawVal === ''){
+        // value is a nested block on following more-indented lines
+        if(pos < lines.length && lines[pos].indent > indent){
+          obj[key] = parseBlock(indent + 1);
+        } else {
+          obj[key] = null;
+        }
+      } else {
+        obj[key] = coerceScalar(rawVal);
+      }
+    }
+    return obj;
+  }
+
+  if(lines.length === 0) return null;
+  return parseBlock(lines[0].indent);
+}
+
+function needsQuoting(str){
+  if(str === '') return true;
+  if(/^(true|false|null|~|yes|no|on|off)$/i.test(str)) return true;
+  if(/^-?\d+(\.\d+)?$/.test(str)) return true;
+  if(/[:#\[\]{},&*!|>'"%@`]/.test(str)) return true;
+  if(/^[\s]|[\s]$/.test(str)) return true;
+  return false;
+}
+
+function yamlScalar(v){
+  if(v === null || v === undefined) return 'null';
+  if(typeof v === 'boolean') return String(v);
+  if(typeof v === 'number') return String(v);
+  if(typeof v === 'string'){
+    return needsQuoting(v) ? JSON.stringify(v) : v;
+  }
+  return JSON.stringify(v);
+}
+
+function jsonToYaml(value, indent = 0){
+  const pad = '  '.repeat(indent);
+  if(Array.isArray(value)){
+    if(value.length === 0) return pad + '[]\n';
+    let out = '';
+    for(const item of value){
+      if(item !== null && typeof item === 'object'){
+        const nested = jsonToYaml(item, indent + 1);
+        const firstLineStripped = nested.replace(new RegExp('^' + '  '.repeat(indent + 1)), '');
+        out += pad + '- ' + firstLineStripped;
+      } else {
+        out += pad + '- ' + yamlScalar(item) + '\n';
+      }
+    }
+    return out;
+  }
+  if(value !== null && typeof value === 'object'){
+    const keys = Object.keys(value);
+    if(keys.length === 0) return pad + '{}\n';
+    let out = '';
+    for(const key of keys){
+      const v = value[key];
+      const keyStr = needsQuoting(String(key)) ? JSON.stringify(String(key)) : key;
+      if(v !== null && typeof v === 'object' && Object.keys(v).length > 0){
+        out += pad + keyStr + ':\n' + jsonToYaml(v, indent + 1);
+      } else if(Array.isArray(v) && v.length > 0){
+        out += pad + keyStr + ':\n' + jsonToYaml(v, indent);
+      } else {
+        out += pad + keyStr + ': ' + yamlScalar(v) + '\n';
+      }
+    }
+    return out;
+  }
+  return pad + yamlScalar(value) + '\n';
+}
+
+
+  const modeToggle = document.getElementById('modeToggle');
+  const inputArea = document.getElementById('inputArea');
+  const inputLabel = document.getElementById('inputLabel');
+  const outputLabel = document.getElementById('outputLabel');
+  const outputBox = document.getElementById('outputBox');
+  const copyBtn = document.getElementById('copyBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const themeToggle = document.getElementById('themeToggle');
+  const uiLangSelect = document.getElementById('uiLangSelect');
+
+  const seoH1 = document.getElementById('seoH1');
+  const seoIntro = document.getElementById('seoIntro');
+  const seoToggle = document.getElementById('seoToggle');
+  const faqH2 = document.getElementById('faqH2');
+  const faq1Q = document.getElementById('faq1Q'), faq1A = document.getElementById('faq1A');
+  const faq2Q = document.getElementById('faq2Q'), faq2A = document.getElementById('faq2A');
+  const faq3Q = document.getElementById('faq3Q'), faq3A = document.getElementById('faq3A');
+  const footerPrivacy = document.getElementById('footerPrivacy');
+  const footerTerms = document.getElementById('footerTerms');
+
+  let mode = 'yaml2json';
+  let uiLang = 'en';
+
+  const translations = {
+    en: {
+      modeY2J: 'YAML → JSON', modeJ2Y: 'JSON → YAML',
+      labelYaml: 'YAML', labelJson: 'JSON', copy: 'Copy result', copied: 'Copied', clear: 'Clear',
+      errYaml: 'Could not parse YAML: ', errJson: 'Could not parse JSON: ',
+      seoH1: 'Free Online YAML ↔ JSON Converter',
+      seoIntro: 'Convert YAML to JSON or JSON to YAML instantly. Runs entirely in your browser.',
+      seoToggle: 'FAQ', faqH2: 'Frequently asked questions',
+      faq1Q: 'What YAML features are supported?',
+      faq1A: 'Nested mappings and lists (block and flow style), strings, numbers, booleans, null, and comments. Advanced features like anchors, aliases, multi-document files, and block scalars (| or >) are not supported.',
+      faq2Q: 'Why did my YAML fail to convert?',
+      faq2A: 'Usually inconsistent indentation, tabs instead of spaces, or an unsupported feature like anchors/aliases or block scalars. Try simplifying the file to a plain mapping/list structure.',
+      faq3Q: 'Is my data sent to a server?',
+      faq3A: 'No. The conversion happens entirely in your browser.',
+      footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service'
+    },
+    zh: {
+      modeY2J: 'YAML → JSON', modeJ2Y: 'JSON → YAML',
+      labelYaml: 'YAML', labelJson: 'JSON', copy: '复制结果', copied: '已复制', clear: '清除',
+      errYaml: '无法解析 YAML：', errJson: '无法解析 JSON：',
+      seoH1: '免费在线 YAML ↔ JSON 转换工具',
+      seoIntro: '即时将 YAML 转换为 JSON，或将 JSON 转换为 YAML。完全在您的浏览器中运行。',
+      seoToggle: '常见问题', faqH2: '常见问题',
+      faq1Q: '支持哪些 YAML 特性？',
+      faq1A: '支持嵌套映射和列表（块状和流式）、字符串、数字、布尔值、null 以及注释。不支持锚点、别名、多文档文件和块状标量（| 或 >）等高级特性。',
+      faq2Q: '为什么我的 YAML 转换失败了？',
+      faq2A: '通常是缩进不一致、使用了制表符而非空格，或使用了锚点/别名、块状标量等不支持的特性。请尝试简化为普通的映射/列表结构。',
+      faq3Q: '我的数据会被发送到服务器吗？',
+      faq3A: '不会。转换完全在您的浏览器中完成。',
+      footerPrivacy: '隐私政策', footerTerms: '服务条款'
+    },
+    ja: {
+      modeY2J: 'YAML → JSON', modeJ2Y: 'JSON → YAML',
+      labelYaml: 'YAML', labelJson: 'JSON', copy: '結果をコピー', copied: 'コピーしました', clear: 'クリア',
+      errYaml: 'YAML を解析できませんでした: ', errJson: 'JSON を解析できませんでした: ',
+      seoH1: '無料オンライン YAML ↔ JSON 変換ツール',
+      seoIntro: 'YAML を JSON に、または JSON を YAML に即座に変換します。すべてブラウザ内で処理されます。',
+      seoToggle: 'よくある質問', faqH2: 'よくある質問',
+      faq1Q: 'どの YAML の機能に対応していますか？',
+      faq1A: 'ネストしたマッピングとリスト（ブロック形式・フロー形式）、文字列、数値、真偽値、null、コメントに対応しています。アンカー、エイリアス、複数ドキュメント、ブロックスカラー（| や >）などの高度な機能には対応していません。',
+      faq2Q: 'YAML の変換に失敗するのはなぜですか？',
+      faq2A: '多くの場合、インデントの不整合、スペースの代わりのタブ、またはアンカー/エイリアスやブロックスカラーなど非対応の機能が原因です。単純なマッピング/リスト構造に簡略化してみてください。',
+      faq3Q: 'データはサーバーに送信されますか？',
+      faq3A: 'いいえ。変換はすべてブラウザ内で完結します。',
+      footerPrivacy: 'プライバシーポリシー', footerTerms: '利用規約'
+    },
+    ko: {
+      modeY2J: 'YAML → JSON', modeJ2Y: 'JSON → YAML',
+      labelYaml: 'YAML', labelJson: 'JSON', copy: '결과 복사', copied: '복사됨', clear: '지우기',
+      errYaml: 'YAML을 파싱할 수 없어요: ', errJson: 'JSON을 파싱할 수 없어요: ',
+      seoH1: '무료 온라인 YAML ↔ JSON 변환기',
+      seoIntro: 'YAML을 JSON으로, 또는 JSON을 YAML로 즉시 변환해요. 전부 브라우저 안에서 처리됩니다.',
+      seoToggle: 'FAQ', faqH2: '자주 묻는 질문',
+      faq1Q: '어떤 YAML 기능을 지원하나요?',
+      faq1A: '중첩된 매핑과 리스트(블록/플로우 스타일), 문자열, 숫자, 불리언, null, 주석을 지원해요. 앵커, 별칭, 여러 문서 파일, 블록 스칼라(| 또는 >) 같은 고급 기능은 지원하지 않아요.',
+      faq2Q: 'YAML 변환이 왜 실패했나요?',
+      faq2A: '보통 들여쓰기가 일관되지 않거나, 스페이스 대신 탭을 썼거나, 앵커/별칭·블록 스칼라 같은 미지원 기능을 썼을 때예요. 단순한 매핑/리스트 구조로 줄여서 시도해보세요.',
+      faq3Q: '입력한 데이터가 서버로 전송되나요?',
+      faq3A: '아니요. 변환은 전부 브라우저 안에서 처리돼요.',
+      footerPrivacy: '개인정보처리방침', footerTerms: '이용약관'
+    }
+  };
+
+  function t(){ return translations[uiLang]; }
+
+  function applyLanguage(lang){
+    uiLang = lang;
+    document.documentElement.lang = lang;
+    const d = t();
+    modeToggle.children[0].textContent = d.modeY2J;
+    modeToggle.children[1].textContent = d.modeJ2Y;
+    inputLabel.textContent = mode === 'yaml2json' ? d.labelYaml : d.labelJson;
+    outputLabel.textContent = mode === 'yaml2json' ? d.labelJson : d.labelYaml;
+    copyBtn.textContent = d.copy;
+    clearBtn.textContent = d.clear;
+    seoH1.textContent = d.seoH1;
+    seoIntro.textContent = d.seoIntro;
+    seoToggle.textContent = d.seoToggle;
+    faqH2.textContent = d.faqH2;
+    faq1Q.textContent = d.faq1Q; faq1A.textContent = d.faq1A;
+    faq2Q.textContent = d.faq2Q; faq2A.textContent = d.faq2A;
+    faq3Q.textContent = d.faq3Q; faq3A.textContent = d.faq3A;
+    footerPrivacy.textContent = d.footerPrivacy;
+    footerTerms.textContent = d.footerTerms;
+    run();
+  }
+
+  uiLangSelect.addEventListener('change', (e) => {
+    applyLanguage(e.target.value);
+    DevWrightSite.saveSharedLang(e.target.value);
+  });
+
+  modeToggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('.mode-btn');
+    if(!btn) return;
+    modeToggle.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    mode = btn.dataset.mode;
+    const d = t();
+    inputLabel.textContent = mode === 'yaml2json' ? d.labelYaml : d.labelJson;
+    outputLabel.textContent = mode === 'yaml2json' ? d.labelJson : d.labelYaml;
+    inputArea.value = '';
+    outputBox.textContent = '';
+    outputBox.classList.remove('error');
+  });
+
+  function run(){
+    const input = inputArea.value;
+    if(!input.trim()){
+      outputBox.textContent = '';
+      outputBox.classList.remove('error');
+      return;
+    }
+    try {
+      if(mode === 'yaml2json'){
+        const parsed = yamlToJson(input);
+        outputBox.textContent = JSON.stringify(parsed, null, 2);
+      } else {
+        const parsed = JSON.parse(input);
+        outputBox.textContent = jsonToYaml(parsed);
+      }
+      outputBox.classList.remove('error');
+    } catch(e){
+      outputBox.textContent = (mode === 'yaml2json' ? t().errYaml : t().errJson) + e.message;
+      outputBox.classList.add('error');
+    }
+  }
+  inputArea.addEventListener('input', run);
+
+  clearBtn.addEventListener('click', () => {
+    inputArea.value = '';
+    outputBox.textContent = '';
+    outputBox.classList.remove('error');
+  });
+
+  copyBtn.addEventListener('click', async () => {
+    if(!outputBox.textContent) return;
+    const ok = await DevWrightSite.copyTextToClipboard(outputBox.textContent);
+    if(ok){
+      const orig = copyBtn.textContent;
+      copyBtn.textContent = t().copied;
+      setTimeout(() => { copyBtn.textContent = orig; }, 1200);
+    }
+  });
+
+  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+  const appLayoutEl = document.querySelector('.app-layout');
+  DevWrightSite.setupThemeToggle(themeToggle, 'light');
+  DevWrightSite.setupSidebar(sidebarToggleBtn, appLayoutEl);
+  const initialLang = DevWrightSite.getSharedLang('en');
+  uiLangSelect.value = initialLang;
+  applyLanguage(initialLang);
+
+  inputArea.value = 'name: myapp\nversion: 1.0\nfeatures:\n  - fast\n  - simple\nconfig:\n  debug: false\n';
+  run();
+</script>
+</body>
+</html>

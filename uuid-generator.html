@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Online UUID / ULID Generator</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%94%A8</text></svg>">
+<meta name="description" content="Generate UUID v4 or ULID identifiers instantly, in bulk, free in your browser. Choose uppercase, lowercase, or hyphen-free format.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://dev-joohyun.github.io/devwright/uuid-generator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<link rel="stylesheet" href="site.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DevWright UUID / ULID Generator",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any (Web browser)",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free online tool to generate UUID v4 or ULID identifiers, in bulk."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is a UUID v4?",
+      "acceptedAnswer": { "@type": "Answer", "text": "A UUID (Universally Unique Identifier) version 4 is a 128-bit identifier generated using random numbers. The chance of two UUID v4 values colliding is astronomically small, making them safe to use as unique IDs without central coordination." }
+    },
+    {
+      "@type": "Question",
+      "name": "What is a ULID and how is it different from a UUID?",
+      "acceptedAnswer": { "@type": "Answer", "text": "A ULID (Universally Unique Lexicographically Sortable Identifier) encodes a timestamp in its first part, so ULIDs generated later always sort after earlier ones — useful as database keys. A UUID v4 is fully random and has no inherent ordering." }
+    },
+    {
+      "@type": "Question",
+      "name": "Are these generated using a cryptographically secure random source?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. This tool uses the browser's crypto.getRandomValues() API, the same cryptographically secure random number generator used for security-sensitive operations." }
+    }
+  ]
+}
+</script>
+<style>
+  main{ flex:1; display:flex; flex-direction:column; max-width:760px; margin:0 auto; width:100%; padding:32px 24px; gap:20px; }
+  h1{ font-size:18px; margin:0; }
+  .intro{ color:var(--muted); font-size:13px; margin:0; line-height:1.6; }
+
+  .mode-toggle{ display:flex; gap:4px; background:var(--panel); padding:4px; border-radius:8px; border:1px solid var(--border-strong); width:fit-content; }
+  .mode-btn{
+    padding:8px 18px; font-size:12.5px; font-weight:600; color:var(--muted); background:transparent;
+    border:none; border-radius:6px; cursor:pointer;
+  }
+  .mode-btn.active{ background:var(--panel-2); color:var(--text); box-shadow:inset 0 0 0 1px var(--border-strong); }
+
+  .options-row{ display:flex; flex-wrap:wrap; gap:16px; align-items:center; }
+  .option-group{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); }
+  select.opt{
+    background:var(--panel); color:var(--muted); border:1px solid var(--border-strong);
+    border-radius:6px; padding:6px 8px; font-size:12.5px; cursor:pointer; font-family:'JetBrains Mono',monospace;
+  }
+  label.checkbox{ display:flex; align-items:center; gap:6px; cursor:pointer; }
+
+  .actions{ display:flex; gap:10px; align-items:center; }
+  .primary-btn{
+    background:var(--accent); color:var(--format-text); border:none; font-weight:700; font-size:13px;
+    padding:10px 22px; border-radius:8px; cursor:pointer; letter-spacing:0.02em;
+  }
+  .primary-btn:hover{ filter:brightness(1.08); }
+  .icon-btn{
+    background:var(--panel-2); border:1px solid var(--border-strong); color:var(--muted);
+    font-size:12px; padding:8px 14px; border-radius:6px; cursor:pointer;
+  }
+  .icon-btn:hover{ color:var(--text); border-color:var(--border-hover); }
+
+  .id-list{ display:flex; flex-direction:column; gap:8px; }
+  .id-row{
+    display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:6px;
+    padding:8px 12px; background:var(--panel);
+  }
+  .id-value{ flex:1; font-family:'JetBrains Mono',monospace; font-size:13px; word-break:break-all; color:var(--text); }
+  .id-copy{
+    background:var(--panel-2); border:1px solid var(--border-strong); color:var(--muted);
+    font-size:11px; padding:5px 10px; border-radius:6px; cursor:pointer; flex-shrink:0;
+  }
+  .id-copy:hover{ color:var(--text); border-color:var(--border-hover); }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><a href="index.html"><span class="brand-mark">DevWright</span></a></div>
+    <div class="sidebar-group-label">Format</div>
+    <a href="code-formatter.html" class="sidebar-link">Code Formatter</a>
+    <a href="yaml-json.html" class="sidebar-link">YAML ↔ JSON</a>
+    <div class="sidebar-group-label">Encode / Decode</div>
+    <a href="base64-tool.html" class="sidebar-link">Base64</a>
+    <a href="url-encoder.html" class="sidebar-link">URL Encoder</a>
+    <a href="jwt-decoder.html" class="sidebar-link">JWT Decoder</a>
+    <div class="sidebar-group-label">Generate</div>
+    <a href="hash-generator.html" class="sidebar-link">Hash Generator</a>
+    <a href="uuid-generator.html" class="sidebar-link active" aria-current="page">UUID Generator</a>
+    <div class="sidebar-group-label">Convert</div>
+    <a href="unix-timestamp.html" class="sidebar-link">Unix Timestamp</a>
+    <a href="color-converter.html" class="sidebar-link">Color Converter</a>
+    <a href="curl-converter.html" class="sidebar-link">Curl Converter</a>
+    <div class="sidebar-group-label">Test</div>
+    <a href="regex-tester.html" class="sidebar-link">Regex Tester</a>
+  </aside>
+
+  <div class="content-col">
+<header>
+  <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle sidebar" title="Collapse sidebar">☰</button>
+  <div class="header-settings">
+    <select class="lang-select" id="uiLangSelect">
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+    </select>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main>
+  <h1 id="seoH1">Free Online UUID / ULID Generator</h1>
+  <p class="intro" id="seoIntro">Generate UUID v4 or ULID identifiers instantly, one at a time or in bulk. Runs entirely in your browser using a cryptographically secure random source.</p>
+
+  <div class="mode-toggle" id="modeToggle">
+    <button class="mode-btn active" data-mode="uuid">UUID v4</button>
+    <button class="mode-btn" data-mode="ulid">ULID</button>
+  </div>
+
+  <div class="options-row">
+    <div class="option-group">
+      <span id="countLabel">Count</span>
+      <select class="opt" id="countSelect">
+        <option value="1">1</option>
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="20">20</option>
+      </select>
+    </div>
+    <label class="checkbox" id="uuidOnlyOptions">
+      <input type="checkbox" id="uppercaseCheck"> <span id="uppercaseLabel">Uppercase</span>
+    </label>
+    <label class="checkbox" id="uuidOnlyOptions2">
+      <input type="checkbox" id="noHyphenCheck"> <span id="noHyphenLabel">No hyphens</span>
+    </label>
+  </div>
+
+  <div class="actions">
+    <button class="primary-btn" id="generateBtn">Generate</button>
+    <button class="icon-btn" id="copyAllBtn">Copy all</button>
+  </div>
+
+  <div class="id-list" id="idList"></div>
+
+  <details class="seo-more">
+    <summary id="seoToggle">FAQ</summary>
+    <h2 id="faqH2">Frequently asked questions</h2>
+    <details><summary id="faq1Q">What is a UUID v4?</summary><p id="faq1A">A UUID (Universally Unique Identifier) version 4 is a 128-bit identifier generated using random numbers. The chance of two UUID v4 values colliding is astronomically small, making them safe to use as unique IDs without central coordination.</p></details>
+    <details><summary id="faq2Q">What is a ULID and how is it different from a UUID?</summary><p id="faq2A">A ULID (Universally Unique Lexicographically Sortable Identifier) encodes a timestamp in its first part, so ULIDs generated later always sort after earlier ones — useful as database keys. A UUID v4 is fully random and has no inherent ordering.</p></details>
+    <details><summary id="faq3Q">Are these generated using a cryptographically secure random source?</summary><p id="faq3A">Yes. This tool uses the browser's crypto.getRandomValues() API, the same cryptographically secure random number generator used for security-sensitive operations.</p></details>
+  </details>
+</main>
+
+<div class="site-footer">
+  <span id="footerCopyright">© 2026 DevWright</span>
+  <a href="index.html#privacy" id="footerPrivacy">Privacy Policy</a>
+  <a href="index.html#terms" id="footerTerms">Terms of Service</a>
+</div>
+
+  </div>
+</div>
+
+<script src="site.js"></script>
+<script>
+  const uiLangSelect = document.getElementById('uiLangSelect');
+  const themeToggle = document.getElementById('themeToggle');
+  const modeToggle = document.getElementById('modeToggle');
+  const countLabel = document.getElementById('countLabel');
+  const countSelect = document.getElementById('countSelect');
+  const uppercaseCheck = document.getElementById('uppercaseCheck');
+  const uppercaseLabel = document.getElementById('uppercaseLabel');
+  const noHyphenCheck = document.getElementById('noHyphenCheck');
+  const noHyphenLabel = document.getElementById('noHyphenLabel');
+  const uuidOnlyOptions = document.getElementById('uuidOnlyOptions');
+  const uuidOnlyOptions2 = document.getElementById('uuidOnlyOptions2');
+  const generateBtn = document.getElementById('generateBtn');
+  const copyAllBtn = document.getElementById('copyAllBtn');
+  const idList = document.getElementById('idList');
+
+  const seoH1 = document.getElementById('seoH1');
+  const seoIntro = document.getElementById('seoIntro');
+  const seoToggle = document.getElementById('seoToggle');
+  const faqH2 = document.getElementById('faqH2');
+  const faq1Q = document.getElementById('faq1Q'), faq1A = document.getElementById('faq1A');
+  const faq2Q = document.getElementById('faq2Q'), faq2A = document.getElementById('faq2A');
+  const faq3Q = document.getElementById('faq3Q'), faq3A = document.getElementById('faq3A');
+  const footerPrivacy = document.getElementById('footerPrivacy');
+  const footerTerms = document.getElementById('footerTerms');
+
+  let mode = 'uuid';
+  let uiLang = 'en';
+
+  const translations = {
+    en: {
+      modeUuid: 'UUID v4', modeUlid: 'ULID', count: 'Count', uppercase: 'Uppercase', noHyphen: 'No hyphens',
+      generate: 'Generate', copyAll: 'Copy all', copied: 'Copied',
+      seoH1: 'Free Online UUID / ULID Generator',
+      seoIntro: 'Generate UUID v4 or ULID identifiers instantly, one at a time or in bulk. Runs entirely in your browser using a cryptographically secure random source.',
+      seoToggle: 'FAQ', faqH2: 'Frequently asked questions',
+      faq1Q: 'What is a UUID v4?',
+      faq1A: 'A UUID (Universally Unique Identifier) version 4 is a 128-bit identifier generated using random numbers. The chance of two UUID v4 values colliding is astronomically small, making them safe to use as unique IDs without central coordination.',
+      faq2Q: 'What is a ULID and how is it different from a UUID?',
+      faq2A: 'A ULID (Universally Unique Lexicographically Sortable Identifier) encodes a timestamp in its first part, so ULIDs generated later always sort after earlier ones — useful as database keys. A UUID v4 is fully random and has no inherent ordering.',
+      faq3Q: 'Are these generated using a cryptographically secure random source?',
+      faq3A: "Yes. This tool uses the browser's crypto.getRandomValues() API, the same cryptographically secure random number generator used for security-sensitive operations.",
+      footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service'
+    },
+    zh: {
+      modeUuid: 'UUID v4', modeUlid: 'ULID', count: '数量', uppercase: '大写', noHyphen: '不含连字符',
+      generate: '生成', copyAll: '全部复制', copied: '已复制',
+      seoH1: '免费在线 UUID / ULID 生成器',
+      seoIntro: '即时生成 UUID v4 或 ULID 标识符，可单个生成也可批量生成。全部在您的浏览器中使用密码学安全的随机源完成。',
+      seoToggle: '常见问题', faqH2: '常见问题',
+      faq1Q: '什么是 UUID v4？',
+      faq1A: 'UUID（通用唯一标识符）第4版是使用随机数生成的128位标识符。两个 UUID v4 发生碰撞的概率极低，因此可以在无需中心协调的情况下安全地用作唯一 ID。',
+      faq2Q: 'ULID 是什么，与 UUID 有何不同？',
+      faq2A: 'ULID（通用唯一可按字典序排序标识符）在其前半部分编码了时间戳，因此后生成的 ULID 排序总是在前面生成的之后——适合作为数据库主键。而 UUID v4 完全随机，没有内在的排序性。',
+      faq3Q: '这些标识符是使用密码学安全的随机源生成的吗？',
+      faq3A: '是的。本工具使用浏览器的 crypto.getRandomValues() API，这与安全敏感操作所用的密码学安全随机数生成器相同。',
+      footerPrivacy: '隐私政策', footerTerms: '服务条款'
+    },
+    ja: {
+      modeUuid: 'UUID v4', modeUlid: 'ULID', count: '個数', uppercase: '大文字', noHyphen: 'ハイフンなし',
+      generate: '生成', copyAll: 'すべてコピー', copied: 'コピーしました',
+      seoH1: '無料オンライン UUID / ULID 生成ツール',
+      seoIntro: 'UUID v4 または ULID 識別子を、1個ずつでもまとめてでも瞬時に生成できます。すべて暗号学的に安全な乱数源を使ってブラウザ内で完結します。',
+      seoToggle: 'よくある質問', faqH2: 'よくある質問',
+      faq1Q: 'UUID v4 とは何ですか？',
+      faq1A: 'UUID（Universally Unique Identifier）バージョン4は、乱数を使って生成される128ビットの識別子です。2つのUUID v4が衝突する確率は天文学的に低く、中央調整なしで一意なIDとして安全に使用できます。',
+      faq2Q: 'ULID とは何ですか？UUID とどう違いますか？',
+      faq2A: 'ULID（Universally Unique Lexicographically Sortable Identifier）は前半部分にタイムスタンプをエンコードしているため、後で生成されたULIDは必ず先に生成されたものより後にソートされます。データベースのキーとして便利です。UUID v4 は完全にランダムで、順序性はありません。',
+      faq3Q: '暗号学的に安全な乱数源を使って生成されていますか？',
+      faq3A: 'はい。このツールはブラウザの crypto.getRandomValues() API を使用しており、セキュリティに関わる用途で使われるのと同じ暗号学的に安全な乱数生成器です。',
+      footerPrivacy: 'プライバシーポリシー', footerTerms: '利用規約'
+    },
+    ko: {
+      modeUuid: 'UUID v4', modeUlid: 'ULID', count: '개수', uppercase: '대문자', noHyphen: '하이픈 없음',
+      generate: '생성', copyAll: '전체 복사', copied: '복사됨',
+      seoH1: '무료 온라인 UUID / ULID 생성기',
+      seoIntro: 'UUID v4 또는 ULID 식별자를 하나씩 또는 여러 개씩 즉시 생성해요. 암호학적으로 안전한 난수 소스를 사용해 전부 브라우저 안에서 처리됩니다.',
+      seoToggle: 'FAQ', faqH2: '자주 묻는 질문',
+      faq1Q: 'UUID v4가 뭔가요?',
+      faq1A: 'UUID(범용 고유 식별자) 버전 4는 난수를 이용해 만드는 128비트 식별자예요. 두 UUID v4가 충돌할 확률은 천문학적으로 낮아서, 중앙 조율 없이도 안전하게 고유 ID로 쓸 수 있어요.',
+      faq2Q: 'ULID는 뭐고 UUID랑 뭐가 다른가요?',
+      faq2A: 'ULID(사전순 정렬 가능한 범용 고유 식별자)는 앞부분에 타임스탬프가 들어 있어서, 나중에 생성된 ULID가 항상 먼저 생성된 것보다 뒤에 정렬돼요. 데이터베이스 키로 쓰기 좋아요. UUID v4는 완전히 무작위라 순서 정보가 없어요.',
+      faq3Q: '암호학적으로 안전한 난수로 생성되나요?',
+      faq3A: '네. 이 도구는 브라우저의 crypto.getRandomValues() API를 사용하는데, 이건 보안이 중요한 작업에도 쓰이는 것과 같은 암호학적으로 안전한 난수 생성기예요.',
+      footerPrivacy: '개인정보처리방침', footerTerms: '이용약관'
+    }
+  };
+
+  function t(){ return translations[uiLang]; }
+
+  function applyLanguage(lang){
+    uiLang = lang;
+    document.documentElement.lang = lang;
+    const dict = t();
+    modeToggle.querySelector('[data-mode="uuid"]').textContent = dict.modeUuid;
+    modeToggle.querySelector('[data-mode="ulid"]').textContent = dict.modeUlid;
+    countLabel.textContent = dict.count;
+    uppercaseLabel.textContent = dict.uppercase;
+    noHyphenLabel.textContent = dict.noHyphen;
+    generateBtn.textContent = dict.generate;
+    copyAllBtn.textContent = dict.copyAll;
+    seoH1.textContent = dict.seoH1;
+    seoIntro.textContent = dict.seoIntro;
+    seoToggle.textContent = dict.seoToggle;
+    faqH2.textContent = dict.faqH2;
+    faq1Q.textContent = dict.faq1Q; faq1A.textContent = dict.faq1A;
+    faq2Q.textContent = dict.faq2Q; faq2A.textContent = dict.faq2A;
+    faq3Q.textContent = dict.faq3Q; faq3A.textContent = dict.faq3A;
+    footerPrivacy.textContent = dict.footerPrivacy;
+    footerTerms.textContent = dict.footerTerms;
+  }
+
+  uiLangSelect.addEventListener('change', (e) => {
+    applyLanguage(e.target.value);
+    DevWrightSite.saveSharedLang(e.target.value);
+  });
+
+  function genUuidV4(){
+    if(crypto.randomUUID) return crypto.randomUUID();
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+    return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+  }
+
+  const CROCKFORD = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+  function genUlid(){
+    let time = Date.now();
+    let timeChars = '';
+    for(let i = 0; i < 10; i++){
+      timeChars = CROCKFORD[time % 32] + timeChars;
+      time = Math.floor(time / 32);
+    }
+    const randBytes = crypto.getRandomValues(new Uint8Array(16));
+    let randChars = '';
+    for(let i = 0; i < 16; i++){
+      randChars += CROCKFORD[randBytes[i] % 32];
+    }
+    return timeChars + randChars;
+  }
+
+  function applyFormatting(uuid){
+    let result = uuid;
+    if(noHyphenCheck.checked) result = result.replace(/-/g, '');
+    if(uppercaseCheck.checked) result = result.toUpperCase();
+    return result;
+  }
+
+  function renderList(){
+    idList.innerHTML = '';
+    const count = parseInt(countSelect.value, 10);
+    for(let i = 0; i < count; i++){
+      const raw = mode === 'uuid' ? genUuidV4() : genUlid();
+      const value = mode === 'uuid' ? applyFormatting(raw) : raw;
+      const row = document.createElement('div');
+      row.className = 'id-row';
+      const span = document.createElement('span');
+      span.className = 'id-value';
+      span.textContent = value;
+      const btn = document.createElement('button');
+      btn.className = 'id-copy';
+      btn.textContent = t().copy || 'Copy';
+      btn.addEventListener('click', async () => {
+        const ok = await DevWrightSite.copyTextToClipboard(value);
+        if(ok){
+          const original = btn.textContent;
+          btn.textContent = t().copied;
+          setTimeout(() => { btn.textContent = original; }, 1200);
+        }
+      });
+      row.appendChild(span);
+      row.appendChild(btn);
+      idList.appendChild(row);
+    }
+  }
+
+  modeToggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('.mode-btn');
+    if(!btn) return;
+    modeToggle.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    mode = btn.dataset.mode;
+    const showUuidOptions = mode === 'uuid';
+    uuidOnlyOptions.style.display = showUuidOptions ? 'flex' : 'none';
+    uuidOnlyOptions2.style.display = showUuidOptions ? 'flex' : 'none';
+    renderList();
+  });
+
+  generateBtn.addEventListener('click', renderList);
+  countSelect.addEventListener('change', renderList);
+  uppercaseCheck.addEventListener('change', renderList);
+  noHyphenCheck.addEventListener('change', renderList);
+
+  copyAllBtn.addEventListener('click', async () => {
+    const values = Array.from(idList.querySelectorAll('.id-value')).map(el => el.textContent);
+    if(values.length === 0) return;
+    const ok = await DevWrightSite.copyTextToClipboard(values.join('\n'));
+    if(ok){
+      const original = copyAllBtn.textContent;
+      copyAllBtn.textContent = t().copied;
+      setTimeout(() => { copyAllBtn.textContent = original; }, 1200);
+    }
+  });
+
+  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+  const appLayoutEl = document.querySelector('.app-layout');
+  DevWrightSite.setupThemeToggle(themeToggle, 'light');
+  DevWrightSite.setupSidebar(sidebarToggleBtn, appLayoutEl);
+  const initialLang = DevWrightSite.getSharedLang('en');
+  uiLangSelect.value = initialLang;
+  applyLanguage(initialLang);
+  renderList();
+</script>
+</body>
+</html>

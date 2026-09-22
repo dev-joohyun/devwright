@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Online JWT Decoder</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%94%A8</text></svg>">
+<meta name="description" content="Paste a JWT and instantly see its decoded header and payload as formatted JSON. Free, runs entirely in your browser — your token is never sent anywhere.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://dev-joohyun.github.io/devwright/jwt-decoder.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<link rel="stylesheet" href="site.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DevWright JWT Decoder",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any (Web browser)",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free online tool to decode a JSON Web Token's header and payload as formatted JSON."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does this verify the JWT signature?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. This tool only decodes the header and payload segments — it does not verify the signature, since that requires the secret key or public key used to sign the token." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it safe to paste a real token here?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Decoding happens entirely in your browser and the token is never sent anywhere, but you should still avoid pasting real production tokens into any website as a general security practice." }
+    },
+    {
+      "@type": "Question",
+      "name": "What is a JWT?",
+      "acceptedAnswer": { "@type": "Answer", "text": "A JSON Web Token (JWT) is a compact, URL-safe way to represent claims (like a user ID or expiry time) between two parties, made of a Base64URL-encoded header, payload, and signature separated by dots." }
+    }
+  ]
+}
+</script>
+<style>
+  :root{
+    --tok-key: #79C0FF; --tok-string: #7EE787; --tok-number: #F2A65A; --tok-boolean: #C99CF9;
+  }
+  html[data-theme="light"]{
+    --tok-key: #0B5FA5; --tok-string: #1A7F37; --tok-number: #9A5B00; --tok-boolean: #7A3E9D;
+  }
+
+  main{ flex:1; display:flex; flex-direction:column; max-width:800px; margin:0 auto; width:100%; padding:32px 24px; gap:20px; }
+  h1{ font-size:18px; margin:0; }
+  .intro{ color:var(--muted); font-size:13px; margin:0; line-height:1.6; }
+  .warning{
+    font-size:12px; color:var(--muted); background:var(--panel-2); border:1px solid var(--line);
+    border-radius:8px; padding:10px 14px; line-height:1.6;
+  }
+
+  .field-label{ font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; }
+  textarea{
+    width:100%; min-height:110px; resize:vertical; border:1px solid var(--line); border-radius:8px;
+    background:var(--panel); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:13px;
+    line-height:1.6; padding:14px 16px; overflow:auto; white-space:pre-wrap; word-break:break-all;
+  }
+  textarea:focus{ outline:none; border-color:var(--border-hover); }
+
+  .decoded-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:640px){ .decoded-grid{ grid-template-columns:1fr; } }
+  .decoded-box{ border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .decoded-head{
+    padding:8px 14px; background:var(--panel-2); font-size:11.5px; font-weight:600; color:var(--muted);
+  }
+  .decoded-body{
+    padding:14px 16px; background:var(--panel); font-size:13px; line-height:1.7;
+    white-space:pre; overflow:auto; min-height:80px; font-family:'JetBrains Mono',monospace;
+  }
+  .decoded-body.error{ color:var(--error); white-space:pre-wrap; }
+  .tok-key{ color:var(--tok-key); }
+  .tok-string{ color:var(--tok-string); }
+  .tok-number{ color:var(--tok-number); }
+  .tok-boolean{ color:var(--tok-boolean); }
+  .tok-punct{ color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><a href="index.html"><span class="brand-mark">DevWright</span></a></div>
+    <div class="sidebar-group-label">Format</div>
+    <a href="code-formatter.html" class="sidebar-link">Code Formatter</a>
+    <a href="yaml-json.html" class="sidebar-link">YAML ↔ JSON</a>
+    <div class="sidebar-group-label">Encode / Decode</div>
+    <a href="base64-tool.html" class="sidebar-link">Base64</a>
+    <a href="url-encoder.html" class="sidebar-link">URL Encoder</a>
+    <a href="jwt-decoder.html" class="sidebar-link active" aria-current="page">JWT Decoder</a>
+    <div class="sidebar-group-label">Generate</div>
+    <a href="hash-generator.html" class="sidebar-link">Hash Generator</a>
+    <a href="uuid-generator.html" class="sidebar-link">UUID Generator</a>
+    <div class="sidebar-group-label">Convert</div>
+    <a href="unix-timestamp.html" class="sidebar-link">Unix Timestamp</a>
+    <a href="color-converter.html" class="sidebar-link">Color Converter</a>
+    <a href="curl-converter.html" class="sidebar-link">Curl Converter</a>
+    <div class="sidebar-group-label">Test</div>
+    <a href="regex-tester.html" class="sidebar-link">Regex Tester</a>
+  </aside>
+
+  <div class="content-col">
+<header>
+  <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle sidebar" title="Collapse sidebar">☰</button>
+  <div class="header-settings">
+    <select class="lang-select" id="uiLangSelect">
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+    </select>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main>
+  <h1 id="seoH1">Free Online JWT Decoder</h1>
+  <p class="intro" id="seoIntro">Paste a JSON Web Token below to instantly see its decoded header and payload.</p>
+  <div class="warning" id="warningBox">⚠️ This only <strong>decodes</strong> the token — it does not verify the signature. Never paste a token you don't trust into any website, and never share a real production token publicly.</div>
+
+  <div>
+    <div class="field-label" id="jwtLabel">JWT</div>
+    <textarea id="inputArea" placeholder="Paste your JWT here (header.payload.signature)..."></textarea>
+  </div>
+
+  <div class="decoded-grid">
+    <div class="decoded-box">
+      <div class="decoded-head" id="headerLabel">Header</div>
+      <div class="decoded-body" id="headerBox"></div>
+    </div>
+    <div class="decoded-box">
+      <div class="decoded-head" id="payloadLabel">Payload</div>
+      <div class="decoded-body" id="payloadBox"></div>
+    </div>
+  </div>
+
+  <details class="seo-more">
+    <summary id="seoToggle">FAQ</summary>
+    <h2 id="faqH2">Frequently asked questions</h2>
+    <details><summary id="faq1Q">Does this verify the JWT signature?</summary><p id="faq1A">No. This tool only decodes the header and payload segments — it does not verify the signature, since that requires the secret key or public key used to sign the token.</p></details>
+    <details><summary id="faq2Q">Is it safe to paste a real token here?</summary><p id="faq2A">Decoding happens entirely in your browser and the token is never sent anywhere, but you should still avoid pasting real production tokens into any website as a general security practice.</p></details>
+    <details><summary id="faq3Q">What is a JWT?</summary><p id="faq3A">A JSON Web Token (JWT) is a compact, URL-safe way to represent claims (like a user ID or expiry time) between two parties, made of a Base64URL-encoded header, payload, and signature separated by dots.</p></details>
+  </details>
+</main>
+
+<div class="site-footer">
+  <span id="footerCopyright">© 2026 DevWright</span>
+  <a href="index.html#privacy" id="footerPrivacy">Privacy Policy</a>
+  <a href="index.html#terms" id="footerTerms">Terms of Service</a>
+</div>
+
+  </div>
+</div>
+
+<script src="site.js"></script>
+<script>
+  const inputArea = document.getElementById('inputArea');
+  const headerBox = document.getElementById('headerBox');
+  const payloadBox = document.getElementById('payloadBox');
+  const themeToggle = document.getElementById('themeToggle');
+  const uiLangSelect = document.getElementById('uiLangSelect');
+
+  const seoH1 = document.getElementById('seoH1');
+  const seoIntro = document.getElementById('seoIntro');
+  const warningBox = document.getElementById('warningBox');
+  const jwtLabel = document.getElementById('jwtLabel');
+  const headerLabel = document.getElementById('headerLabel');
+  const payloadLabel = document.getElementById('payloadLabel');
+  const seoToggle = document.getElementById('seoToggle');
+  const faqH2 = document.getElementById('faqH2');
+  const faq1Q = document.getElementById('faq1Q'), faq1A = document.getElementById('faq1A');
+  const faq2Q = document.getElementById('faq2Q'), faq2A = document.getElementById('faq2A');
+  const faq3Q = document.getElementById('faq3Q'), faq3A = document.getElementById('faq3A');
+  const footerPrivacy = document.getElementById('footerPrivacy');
+  const footerTerms = document.getElementById('footerTerms');
+
+  let uiLang = 'en';
+  let lastNotJwtMessage = null; // tracks whether the "not a valid JWT" message is currently shown, so language switches can re-render it
+
+  const translations = {
+    en: {
+      jwtLabel: 'JWT', headerLabel: 'Header', payloadLabel: 'Payload',
+      warning: "⚠️ This only <strong>decodes</strong> the token — it does not verify the signature. Never paste a token you don't trust into any website, and never share a real production token publicly.",
+      notValid: 'Not a valid JWT (expected header.payload.signature)',
+      decodeError: 'Could not decode: ',
+      seoH1: 'Free Online JWT Decoder',
+      seoIntro: 'Paste a JSON Web Token below to instantly see its decoded header and payload.',
+      seoToggle: 'FAQ',
+      faqH2: 'Frequently asked questions',
+      faq1Q: 'Does this verify the JWT signature?',
+      faq1A: 'No. This tool only decodes the header and payload segments — it does not verify the signature, since that requires the secret key or public key used to sign the token.',
+      faq2Q: 'Is it safe to paste a real token here?',
+      faq2A: 'Decoding happens entirely in your browser and the token is never sent anywhere, but you should still avoid pasting real production tokens into any website as a general security practice.',
+      faq3Q: 'What is a JWT?',
+      faq3A: 'A JSON Web Token (JWT) is a compact, URL-safe way to represent claims (like a user ID or expiry time) between two parties, made of a Base64URL-encoded header, payload, and signature separated by dots.',
+      footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service'
+    },
+    zh: {
+      jwtLabel: 'JWT', headerLabel: '头部 (Header)', payloadLabel: '负载 (Payload)',
+      warning: '⚠️ 此工具仅<strong>解码</strong>令牌——不会验证签名。请勿将不信任的令牌粘贴到任何网站，也不要公开分享真实的生产环境令牌。',
+      notValid: '不是有效的 JWT（应为 header.payload.signature 格式）',
+      decodeError: '无法解码：',
+      seoH1: '免费在线 JWT 解码工具',
+      seoIntro: '在下方粘贴 JSON Web Token，即可立即看到解码后的头部和负载。',
+      seoToggle: '常见问题',
+      faqH2: '常见问题',
+      faq1Q: '这个工具会验证 JWT 签名吗？',
+      faq1A: '不会。此工具只解码头部和负载部分——不验证签名，因为验证签名需要用于签署令牌的密钥或公钥。',
+      faq2Q: '在这里粘贴真实令牌安全吗？',
+      faq2A: '解码完全在您的浏览器中进行，令牌不会发送到任何地方，但出于一般安全考虑，仍建议不要将真实的生产环境令牌粘贴到任何网站。',
+      faq3Q: '什么是 JWT？',
+      faq3A: 'JSON Web Token（JWT）是一种紧凑、URL 安全的方式，用于在双方之间传递声明（如用户 ID 或过期时间），由用点分隔的 Base64URL 编码的头部、负载和签名组成。',
+      footerPrivacy: '隐私政策', footerTerms: '服务条款'
+    },
+    ja: {
+      jwtLabel: 'JWT', headerLabel: 'ヘッダー', payloadLabel: 'ペイロード',
+      warning: '⚠️ このツールはトークンを<strong>デコード</strong>するだけで、署名の検証は行いません。信頼できないトークンをどんなサイトにも貼り付けないでください。また、本番環境の実際のトークンを公開しないでください。',
+      notValid: '有効な JWT ではありません（header.payload.signature 形式である必要があります）',
+      decodeError: 'デコードできませんでした: ',
+      seoH1: '無料オンライン JWT デコーダー',
+      seoIntro: '下に JSON Web Token を貼り付けると、デコードされたヘッダーとペイロードがすぐに表示されます。',
+      seoToggle: 'よくある質問',
+      faqH2: 'よくある質問',
+      faq1Q: 'このツールは JWT の署名を検証しますか？',
+      faq1A: 'いいえ。このツールはヘッダーとペイロードをデコードするだけで、署名の検証は行いません。検証にはトークンの署名に使われた秘密鍵または公開鍵が必要です。',
+      faq2Q: '実際のトークンをここに貼り付けても安全ですか？',
+      faq2A: 'デコードはすべてブラウザ内で行われ、トークンがどこかに送信されることはありませんが、一般的なセキュリティ対策として、本番環境の実際のトークンをどのサイトにも貼り付けないことをおすすめします。',
+      faq3Q: 'JWT とは何ですか？',
+      faq3A: 'JSON Web Token（JWT）は、ユーザーIDや有効期限などのクレームを当事者間でやり取りするための、コンパクトで URL セーフな形式です。Base64URL エンコードされたヘッダー・ペイロード・署名がドットで区切られて構成されています。',
+      footerPrivacy: 'プライバシーポリシー', footerTerms: '利用規約'
+    },
+    ko: {
+      jwtLabel: 'JWT', headerLabel: '헤더', payloadLabel: '페이로드',
+      warning: '⚠️ 이 도구는 토큰을 <strong>디코딩</strong>만 할 뿐, 서명은 검증하지 않아요. 신뢰할 수 없는 토큰을 어떤 사이트에도 붙여넣지 마시고, 실제 프로덕션 토큰을 공개적으로 공유하지 마세요.',
+      notValid: '유효한 JWT가 아니에요 (header.payload.signature 형식이어야 함)',
+      decodeError: '디코딩할 수 없어요: ',
+      seoH1: '무료 온라인 JWT 디코더',
+      seoIntro: '아래에 JSON Web Token을 붙여넣으면 디코딩된 헤더와 페이로드를 바로 확인할 수 있어요.',
+      seoToggle: 'FAQ',
+      faqH2: '자주 묻는 질문',
+      faq1Q: '이 도구가 JWT 서명도 검증하나요?',
+      faq1A: '아니요. 이 도구는 헤더와 페이로드만 디코딩할 뿐, 서명은 검증하지 않아요. 서명 검증에는 토큰 서명에 쓰인 비밀키나 공개키가 필요하거든요.',
+      faq2Q: '실제 토큰을 여기 붙여넣어도 안전한가요?',
+      faq2A: '디코딩은 전부 브라우저 안에서 이루어지고 토큰이 어디로도 전송되지 않지만, 일반적인 보안 습관으로 실제 프로덕션 토큰은 어떤 사이트에도 붙여넣지 않는 걸 권장해요.',
+      faq3Q: 'JWT가 뭔가요?',
+      faq3A: 'JSON Web Token(JWT)은 사용자 ID나 만료 시간 같은 정보(claim)를 양쪽이 주고받을 때 쓰는 간결하고 URL에 안전한 형식이에요. 점(.)으로 구분된 Base64URL 인코딩 헤더·페이로드·서명으로 구성됩니다.',
+      footerPrivacy: '개인정보처리방침', footerTerms: '이용약관'
+    }
+  };
+
+  function t(){ return translations[uiLang]; }
+
+  function applyLanguage(lang){
+    uiLang = lang;
+    document.documentElement.lang = lang;
+    const dict = t();
+    jwtLabel.textContent = dict.jwtLabel;
+    headerLabel.textContent = dict.headerLabel;
+    payloadLabel.textContent = dict.payloadLabel;
+    warningBox.innerHTML = dict.warning;
+    seoH1.textContent = dict.seoH1;
+    seoIntro.textContent = dict.seoIntro;
+    seoToggle.textContent = dict.seoToggle;
+    faqH2.textContent = dict.faqH2;
+    faq1Q.textContent = dict.faq1Q; faq1A.textContent = dict.faq1A;
+    faq2Q.textContent = dict.faq2Q; faq2A.textContent = dict.faq2A;
+    faq3Q.textContent = dict.faq3Q; faq3A.textContent = dict.faq3A;
+    footerPrivacy.textContent = dict.footerPrivacy;
+    footerTerms.textContent = dict.footerTerms;
+    // re-render the current decode state so error text stays in sync with language
+    decodeJWT();
+  }
+
+  uiLangSelect.addEventListener('change', (e) => {
+    applyLanguage(e.target.value);
+    DevWrightSite.saveSharedLang(e.target.value);
+  });
+
+  function base64UrlDecode(segment){
+    let b64 = segment.replace(/-/g, '+').replace(/_/g, '/');
+    while(b64.length % 4 !== 0) b64 += '=';
+    const binary = atob(b64);
+    const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  }
+
+  function escapeHtml(str){
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function highlightJSON(str){
+    let html = '';
+    let i = 0;
+    const n = str.length;
+    while(i < n){
+      const c = str[i];
+      if(c === '"'){
+        let j = i + 1;
+        while(j < n){
+          if(str[j] === '\\'){ j += 2; continue; }
+          if(str[j] === '"'){ j++; break; }
+          j++;
+        }
+        const raw = str.slice(i, j);
+        let k = j;
+        while(k < n && /\s/.test(str[k])) k++;
+        const isKey = str[k] === ':';
+        html += `<span class="${isKey ? 'tok-key' : 'tok-string'}">${escapeHtml(raw)}</span>`;
+        i = j;
+      } else if(c === '{' || c === '[' || c === '}' || c === ']'){
+        html += escapeHtml(c);
+        i++;
+      } else if(c === ',' || c === ':'){
+        html += `<span class="tok-punct">${c}</span>`;
+        i++;
+      } else if((c === '-' && /\d/.test(str[i+1] || '')) || (c >= '0' && c <= '9')){
+        let j = i;
+        if(str[j] === '-') j++;
+        while(j < n && str[j] >= '0' && str[j] <= '9') j++;
+        if(str[j] === '.'){ j++; while(j < n && str[j] >= '0' && str[j] <= '9') j++; }
+        html += `<span class="tok-number">${str.slice(i, j)}</span>`;
+        i = j;
+      } else if(str.startsWith('true', i) || str.startsWith('false', i) || str.startsWith('null', i)){
+        const word = str.startsWith('true', i) ? 'true' : (str.startsWith('false', i) ? 'false' : 'null');
+        html += `<span class="tok-boolean">${word}</span>`;
+        i += word.length;
+      } else {
+        html += escapeHtml(c);
+        i++;
+      }
+    }
+    return html;
+  }
+
+  function decodeSegment(segment, box){
+    try {
+      const json = base64UrlDecode(segment);
+      const parsed = JSON.parse(json);
+      box.innerHTML = highlightJSON(JSON.stringify(parsed, null, 2));
+      box.classList.remove('error');
+    } catch(e){
+      box.textContent = t().decodeError + e.message;
+      box.classList.add('error');
+    }
+  }
+
+  function decodeJWT(){
+    const token = inputArea.value.trim();
+    if(!token){
+      headerBox.textContent = '';
+      payloadBox.textContent = '';
+      headerBox.classList.remove('error');
+      payloadBox.classList.remove('error');
+      return;
+    }
+    const parts = token.split('.');
+    if(parts.length < 2){
+      headerBox.textContent = t().notValid;
+      headerBox.classList.add('error');
+      payloadBox.textContent = '';
+      payloadBox.classList.remove('error');
+      return;
+    }
+    decodeSegment(parts[0], headerBox);
+    decodeSegment(parts[1], payloadBox);
+  }
+
+  inputArea.addEventListener('input', decodeJWT);
+
+  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+  const appLayoutEl = document.querySelector('.app-layout');
+  DevWrightSite.setupThemeToggle(themeToggle, 'light');
+  DevWrightSite.setupSidebar(sidebarToggleBtn, appLayoutEl);
+  const initialLang = DevWrightSite.getSharedLang('en');
+  uiLangSelect.value = initialLang;
+  applyLanguage(initialLang);
+</script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevWright — Free Developer Tools</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%94%A8</text></svg>">
+<meta name="description" content="Free, private developer tools that run entirely in your browser: JSON/HTML/JS/CSS formatter, Base64, URL encoder, JWT decoder, hash generator, UUID generator, color converter, timestamp converter, regex tester, and YAML/JSON conversion.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://dev-joohyun.github.io/devwright/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="DevWright — Free Developer Tools">
+<meta property="og:description" content="Free, private developer tools that run entirely in your browser.">
+<meta property="og:url" content="https://dev-joohyun.github.io/devwright/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<link rel="stylesheet" href="site.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "DevWright",
+  "url": "https://dev-joohyun.github.io/devwright/",
+  "description": "Free, private developer tools that run entirely in your browser."
+}
+</script>
+<style>
+  header{ justify-content:flex-start; }
+  main{ flex:1; max-width:920px; margin:0 auto; width:100%; padding:48px 24px; }
+  .hero{ text-align:center; margin-bottom:36px; }
+  .hero h1{ font-size:22px; margin:0 0 8px; }
+  .hero p{ color:var(--muted); font-size:14px; margin:0; }
+
+  .search-box{
+    width:100%; max-width:420px; margin:20px auto 0; display:block;
+    border:1px solid var(--line); border-radius:8px; background:var(--panel);
+    color:var(--text); font-family:'JetBrains Mono',monospace; font-size:13px; padding:10px 14px;
+  }
+  .search-box:focus{ outline:none; border-color:var(--border-hover); }
+
+  .category{ margin-bottom:32px; }
+  .category-title{
+    font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase;
+    letter-spacing:0.05em; margin-bottom:12px;
+  }
+  .card-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
+  @media (max-width:720px){ .card-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:480px){ .card-grid{ grid-template-columns:1fr; } }
+
+  .tool-card{
+    display:block; border:1px solid var(--line); border-radius:10px; padding:16px;
+    background:var(--panel); text-decoration:none; transition:border-color .15s ease, transform .15s ease;
+  }
+  .tool-card:hover{ border-color:var(--border-hover); transform:translateY(-2px); }
+  .tool-card-icon{ font-size:22px; margin-bottom:8px; }
+  .tool-card-name{ font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px; }
+  .tool-card-desc{ font-size:12px; color:var(--muted); line-height:1.5; }
+  .tool-card.hidden{ display:none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><a href="index.html"><span class="brand-mark">DevWright</span></a></div>
+  <div class="header-settings">
+    <select class="lang-select" id="uiLangSelect">
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+    </select>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Free, private developer tools</h1>
+    <p>Everything runs in your browser. No signup, nothing uploaded.</p>
+    <input type="text" class="search-box" id="searchBox" placeholder="Search tools... (e.g. json, hash, uuid)">
+  </div>
+
+  <div class="category" data-cat="format">
+    <div class="category-title">Format</div>
+    <div class="card-grid">
+      <a href="code-formatter.html" class="tool-card" data-name="formatter json html javascript css">
+        <div class="tool-card-icon">{ }</div>
+        <div class="tool-card-name">Code Formatter</div>
+        <div class="tool-card-desc">JSON, HTML, JavaScript &amp; CSS — format, minify, validate</div>
+      </a>
+      <a href="yaml-json.html" class="tool-card" data-name="yaml json converter">
+        <div class="tool-card-icon">⇄</div>
+        <div class="tool-card-name">YAML ↔ JSON</div>
+        <div class="tool-card-desc">Convert between YAML and JSON instantly</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="category" data-cat="encode">
+    <div class="category-title">Encode / Decode</div>
+    <div class="card-grid">
+      <a href="base64-tool.html" class="tool-card" data-name="base64 encode decode">
+        <div class="tool-card-icon">64</div>
+        <div class="tool-card-name">Base64</div>
+        <div class="tool-card-desc">Encode or decode Base64 text</div>
+      </a>
+      <a href="url-encoder.html" class="tool-card" data-name="url encode decode percent">
+        <div class="tool-card-icon">%</div>
+        <div class="tool-card-name">URL Encoder</div>
+        <div class="tool-card-desc">Percent-encode or decode URLs</div>
+      </a>
+      <a href="jwt-decoder.html" class="tool-card" data-name="jwt decoder token debugger">
+        <div class="tool-card-icon">⚿</div>
+        <div class="tool-card-name">JWT Decoder</div>
+        <div class="tool-card-desc">Decode a JWT's header and payload</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="category" data-cat="generate">
+    <div class="category-title">Generate</div>
+    <div class="card-grid">
+      <a href="hash-generator.html" class="tool-card" data-name="hash md5 sha generator">
+        <div class="tool-card-icon">#</div>
+        <div class="tool-card-name">Hash Generator</div>
+        <div class="tool-card-desc">MD5, SHA-1, SHA-256, SHA-384, SHA-512</div>
+      </a>
+      <a href="uuid-generator.html" class="tool-card" data-name="uuid ulid generator id">
+        <div class="tool-card-icon">◇</div>
+        <div class="tool-card-name">UUID / ULID Generator</div>
+        <div class="tool-card-desc">Generate unique identifiers in bulk</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="category" data-cat="convert">
+    <div class="category-title">Convert</div>
+    <div class="card-grid">
+      <a href="unix-timestamp.html" class="tool-card" data-name="unix timestamp date converter">
+        <div class="tool-card-icon">🕐</div>
+        <div class="tool-card-name">Unix Timestamp</div>
+        <div class="tool-card-desc">Convert timestamps to dates and back</div>
+      </a>
+      <a href="color-converter.html" class="tool-card" data-name="color hex rgb hsl converter">
+        <div class="tool-card-icon">🎨</div>
+        <div class="tool-card-name">Color Converter</div>
+        <div class="tool-card-desc">Convert between HEX, RGB, and HSL</div>
+      </a>
+      <a href="curl-converter.html" class="tool-card" data-name="curl converter python javascript code">
+        <div class="tool-card-icon">⌘</div>
+        <div class="tool-card-name">Curl Converter</div>
+        <div class="tool-card-desc">Turn a curl command into Python, JS, Go, and 7 more languages</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="category" data-cat="test">
+    <div class="category-title">Test</div>
+    <div class="card-grid">
+      <a href="regex-tester.html" class="tool-card" data-name="regex tester regular expression">
+        <div class="tool-card-icon">.*</div>
+        <div class="tool-card-name">Regex Tester</div>
+        <div class="tool-card-desc">Test regular expressions with live highlighting</div>
+      </a>
+    </div>
+  </div>
+</main>
+
+<div class="site-footer">
+  <span>© 2026 DevWright</span>
+  <a href="index.html#privacy">Privacy Policy</a>
+  <a href="index.html#terms">Terms of Service</a>
+</div>
+
+<script src="site.js"></script>
+<script>
+  const themeToggle = document.getElementById('themeToggle');
+  const uiLangSelect = document.getElementById('uiLangSelect');
+  const searchBox = document.getElementById('searchBox');
+
+  searchBox.addEventListener('input', () => {
+    const q = searchBox.value.trim().toLowerCase();
+    document.querySelectorAll('.tool-card').forEach(card => {
+      const match = !q || card.dataset.name.includes(q);
+      card.classList.toggle('hidden', !match);
+    });
+    document.querySelectorAll('.category').forEach(cat => {
+      const anyVisible = [...cat.querySelectorAll('.tool-card')].some(c => !c.classList.contains('hidden'));
+      cat.style.display = anyVisible ? '' : 'none';
+    });
+  });
+
+  DevWrightSite.setupThemeToggle(themeToggle, 'light');
+  uiLangSelect.value = DevWrightSite.getSharedLang('en');
+  uiLangSelect.addEventListener('change', (e) => DevWrightSite.saveSharedLang(e.target.value));
+</script>
+</body>
+</html>

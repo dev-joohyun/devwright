@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page Not Found — DevWright</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%94%A8</text></svg>">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<link rel="stylesheet" href="site.css">
+<style>
+  header{ justify-content:flex-start; }
+  main{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; gap:16px; padding:48px 24px;
+  }
+  .code-404{ font-family:'JetBrains Mono',monospace; font-size:64px; font-weight:700; color:var(--accent); margin:0; }
+  h1{ font-size:18px; margin:0; }
+  p{ color:var(--muted); font-size:13px; margin:0; }
+  .home-link{
+    margin-top:8px; padding:10px 22px; border-radius:8px; background:var(--accent); color:var(--format-text);
+    text-decoration:none; font-weight:700; font-size:13px;
+  }
+  .home-link:hover{ filter:brightness(1.08); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><a href="index.html"><span class="brand-mark">DevWright</span></a></div>
+  <div class="header-settings">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main>
+  <p class="code-404">404</p>
+  <h1>Page not found</h1>
+  <p>The page you're looking for doesn't exist or may have moved.</p>
+  <a href="index.html" class="home-link">Back to all tools</a>
+</main>
+
+<script src="site.js"></script>
+<script>
+  const themeToggle = document.getElementById('themeToggle');
+  DevWrightSite.setupThemeToggle(themeToggle, 'light');
+</script>
+</body>
+</html>

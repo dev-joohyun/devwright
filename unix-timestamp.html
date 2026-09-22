@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Online Unix Timestamp Converter</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%94%A8</text></svg>">
+<meta name="description" content="Convert Unix timestamps to human-readable dates, or a date to a Unix timestamp. Supports seconds and milliseconds. Free, instant, runs in your browser.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://dev-joohyun.github.io/devwright/unix-timestamp.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<link rel="stylesheet" href="site.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DevWright Unix Timestamp Converter",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any (Web browser)",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free online tool to convert Unix timestamps to human-readable dates and back."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is a Unix timestamp in seconds or milliseconds?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The classic Unix timestamp is in seconds since January 1, 1970 UTC. Many APIs and JavaScript's Date.now() use milliseconds instead. This tool auto-detects which one you pasted based on its length." }
+    },
+    {
+      "@type": "Question",
+      "name": "Does this show local time or UTC?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Both. The result shows your browser's local time as well as the UTC time and the ISO 8601 string." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my input sent to a server?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. The conversion happens entirely in your browser using standard JavaScript Date APIs." }
+    }
+  ]
+}
+</script>
+<style>
+  main{ flex:1; display:flex; flex-direction:column; max-width:760px; margin:0 auto; width:100%; padding:32px 24px; gap:20px; }
+  h1{ font-size:18px; margin:0; }
+  .intro{ color:var(--muted); font-size:13px; margin:0; line-height:1.6; }
+
+  .now-banner{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:12px 16px;
+  }
+  .now-banner .value{ font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; color:var(--accent); }
+  .now-banner .label{ font-size:11.5px; color:var(--muted); }
+
+  .field-label{ font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; }
+  input[type="text"], input[type="datetime-local"]{
+    width:100%; border:1px solid var(--line); border-radius:8px;
+    background:var(--panel); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:14px;
+    padding:12px 14px;
+  }
+  input:focus{ outline:none; border-color:var(--border-hover); }
+
+  .actions{ display:flex; gap:10px; align-items:center; }
+  .primary-btn{
+    background:var(--accent); color:var(--format-text); border:none; font-weight:700; font-size:13px;
+    padding:10px 22px; border-radius:8px; cursor:pointer; letter-spacing:0.02em;
+  }
+  .primary-btn:hover{ filter:brightness(1.08); }
+
+  .result-grid{ display:flex; flex-direction:column; gap:8px; }
+  .result-row{
+    display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:8px;
+    padding:10px 14px; background:var(--panel);
+  }
+  .result-name{ width:110px; flex-shrink:0; font-size:12px; font-weight:700; color:var(--muted); }
+  .result-value{ flex:1; font-size:13px; font-family:'JetBrains Mono',monospace; word-break:break-all; color:var(--text); }
+  .result-value.empty{ color:var(--muted); }
+  .icon-btn{
+    background:var(--panel-2); border:1px solid var(--border-strong); color:var(--muted);
+    font-size:11.5px; padding:6px 12px; border-radius:6px; cursor:pointer; flex-shrink:0;
+  }
+  .icon-btn:hover{ color:var(--text); border-color:var(--border-hover); }
+
+  .section-title{ font-size:13px; font-weight:700; margin:8px 0 0; }
+  .error-box{ color:var(--error); font-size:12.5px; }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><a href="index.html"><span class="brand-mark">DevWright</span></a></div>
+    <div class="sidebar-group-label">Format</div>
+    <a href="code-formatter.html" class="sidebar-link">Code Formatter</a>
+    <a href="yaml-json.html" class="sidebar-link">YAML ↔ JSON</a>
+    <div class="sidebar-group-label">Encode / Decode</div>
+    <a href="base64-tool.html" class="sidebar-link">Base64</a>
+    <a href="url-encoder.html" class="sidebar-link">URL Encoder</a>
+    <a href="jwt-decoder.html" class="sidebar-link">JWT Decoder</a>
+    <div class="sidebar-group-label">Generate</div>
+    <a href="hash-generator.html" class="sidebar-link">Hash Generator</a>
+    <a href="uuid-generator.html" class="sidebar-link">UUID Generator</a>
+    <div class="sidebar-group-label">Convert</div>
+    <a href="unix-timestamp.html" class="sidebar-link active" aria-current="page">Unix Timestamp</a>
+    <a href="color-converter.html" class="sidebar-link">Color Converter</a>
+    <a href="curl-converter.html" class="sidebar-link">Curl Converter</a>
+    <div class="sidebar-group-label">Test</div>
+    <a href="regex-tester.html" class="sidebar-link">Regex Tester</a>
+  </aside>
+
+  <div class="content-col">
+<header>
+  <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle sidebar" title="Collapse sidebar">☰</button>
+  <div class="header-settings">
+    <select class="lang-select" id="uiLangSelect">
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+    </select>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main>
+  <h1 id="seoH1">Free Online Unix Timestamp Converter</h1>
+  <p class="intro" id="seoIntro">Convert a Unix timestamp to a readable date, or a date to a Unix timestamp. Works entirely in your browser.</p>
+
+  <div class="now-banner">
+    <span class="label" id="nowLabel">Current Unix timestamp</span>
+    <span class="value" id="nowValue">—</span>
+  </div>
+
+  <div class="section-title" id="toDateH2">Timestamp → Date</div>
+  <div>
+    <div class="field-label" id="tsInputLabel">Unix timestamp (seconds or milliseconds)</div>
+    <input type="text" id="tsInput" placeholder="1700000000">
+  </div>
+  <div class="result-grid">
+    <div class="result-row"><span class="result-name" id="labelLocal">Local time</span><span class="result-value empty" id="outLocal">—</span></div>
+    <div class="result-row"><span class="result-name" id="labelUtc">UTC</span><span class="result-value empty" id="outUtc">—</span></div>
+    <div class="result-row"><span class="result-name" id="labelIso">ISO 8601</span><span class="result-value empty" id="outIso">—</span><button class="icon-btn" id="copyIso">Copy</button></div>
+    <div class="result-row"><span class="result-name" id="labelRelative">Relative</span><span class="result-value empty" id="outRelative">—</span></div>
+  </div>
+  <div class="error-box" id="tsError"></div>
+
+  <div class="section-title" id="toTsH2">Date → Timestamp</div>
+  <div>
+    <div class="field-label" id="dateInputLabel">Pick a date and time (your local time)</div>
+    <input type="datetime-local" id="dateInput">
+  </div>
+  <div class="result-grid">
+    <div class="result-row"><span class="result-name" id="labelSeconds">Seconds</span><span class="result-value empty" id="outSeconds">—</span><button class="icon-btn" id="copySeconds">Copy</button></div>
+    <div class="result-row"><span class="result-name" id="labelMillis">Milliseconds</span><span class="result-value empty" id="outMillis">—</span><button class="icon-btn" id="copyMillis">Copy</button></div>
+  </div>
+
+  <details class="seo-more">
+    <summary id="seoToggle">FAQ</summary>
+    <h2 id="faqH2">Frequently asked questions</h2>
+    <details><summary id="faq1Q">Is a Unix timestamp in seconds or milliseconds?</summary><p id="faq1A">The classic Unix timestamp is in seconds since January 1, 1970 UTC. Many APIs and JavaScript's Date.now() use milliseconds instead. This tool auto-detects which one you pasted based on its length.</p></details>
+    <details><summary id="faq2Q">Does this show local time or UTC?</summary><p id="faq2A">Both. The result shows your browser's local time as well as the UTC time and the ISO 8601 string.</p></details>
+    <details><summary id="faq3Q">Is my input sent to a server?</summary><p id="faq3A">No. The conversion happens entirely in your browser using standard JavaScript Date APIs.</p></details>
+  </details>
+</main>
+
+<div class="site-footer">
+  <span id="footerCopyright">© 2026 DevWright</span>
+  <a href="index.html#privacy" id="footerPrivacy">Privacy Policy</a>
+  <a href="index.html#terms" id="footerTerms">Terms of Service</a>
+</div>
+
+  </div>
+</div>
+
+<script src="site.js"></script>
+<script>
+  const nowValue = document.getElementById('nowValue');
+  const nowLabel = document.getElementById('nowLabel');
+  const tsInput = document.getElementById('tsInput');
+  const tsInputLabel = document.getElementById('tsInputLabel');
+  const tsError = document.getElementById('tsError');
+  const outLocal = document.getElementById('outLocal');
+  const outUtc = document.getElementById('outUtc');
+  const outIso = document.getElementById('outIso');
+  const outRelative = document.getElementById('outRelative');
+  const dateInput = document.getElementById('dateInput');
+  const dateInputLabel = document.getElementById('dateInputLabel');
+  const outSeconds = document.getElementById('outSeconds');
+  const outMillis = document.getElementById('outMillis');
+  const themeToggle = document.getElementById('themeToggle');
+  const uiLangSelect = document.getElementById('uiLangSelect');
+
+  const seoH1 = document.getElementById('seoH1');
+  const seoIntro = document.getElementById('seoIntro');
+  const toDateH2 = document.getElementById('toDateH2');
+  const toTsH2 = document.getElementById('toTsH2');
+  const labelLocal = document.getElementById('labelLocal');
+  const labelUtc = document.getElementById('labelUtc');
+  const labelIso = document.getElementById('labelIso');
+  const labelRelative = document.getElementById('labelRelative');
+  const labelSeconds = document.getElementById('labelSeconds');
+  const labelMillis = document.getElementById('labelMillis');
+  const copyIso = document.getElementById('copyIso');
+  const copySeconds = document.getElementById('copySeconds');
+  const copyMillis = document.getElementById('copyMillis');
+  const seoToggle = document.getElementById('seoToggle');
+  const faqH2 = document.getElementById('faqH2');
+  const faq1Q = document.getElementById('faq1Q'), faq1A = document.getElementById('faq1A');
+  const faq2Q = document.getElementById('faq2Q'), faq2A = document.getElementById('faq2A');
+  const faq3Q = document.getElementById('faq3Q'), faq3A = document.getElementById('faq3A');
+  const footerPrivacy = document.getElementById('footerPrivacy');
+  const footerTerms = document.getElementById('footerTerms');
+
+  let uiLang = 'en';
+
+  const translations = {
+    en: {
+      nowLabel: 'Current Unix timestamp', tsInputLabel: 'Unix timestamp (seconds or milliseconds)',
+      dateInputLabel: 'Pick a date and time (your local time)',
+      toDateH2: 'Timestamp → Date', toTsH2: 'Date → Timestamp',
+      labelLocal: 'Local time', labelUtc: 'UTC', labelIso: 'ISO 8601', labelRelative: 'Relative',
+      labelSeconds: 'Seconds', labelMillis: 'Milliseconds', copy: 'Copy', copied: 'Copied',
+      invalidTs: 'Not a valid timestamp',
+      seoH1: 'Free Online Unix Timestamp Converter',
+      seoIntro: 'Convert a Unix timestamp to a readable date, or a date to a Unix timestamp. Works entirely in your browser.',
+      seoToggle: 'FAQ', faqH2: 'Frequently asked questions',
+      faq1Q: 'Is a Unix timestamp in seconds or milliseconds?',
+      faq1A: "The classic Unix timestamp is in seconds since January 1, 1970 UTC. Many APIs and JavaScript's Date.now() use milliseconds instead. This tool auto-detects which one you pasted based on its length.",
+      faq2Q: 'Does this show local time or UTC?',
+      faq2A: "Both. The result shows your browser's local time as well as the UTC time and the ISO 8601 string.",
+      faq3Q: 'Is my input sent to a server?',
+      faq3A: 'No. The conversion happens entirely in your browser using standard JavaScript Date APIs.',
+      footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service'
+    },
+    zh: {
+      nowLabel: '当前 Unix 时间戳', tsInputLabel: 'Unix 时间戳（秒或毫秒）',
+      dateInputLabel: '选择日期和时间（本地时间）',
+      toDateH2: '时间戳 → 日期', toTsH2: '日期 → 时间戳',
+      labelLocal: '本地时间', labelUtc: 'UTC', labelIso: 'ISO 8601', labelRelative: '相对时间',
+      labelSeconds: '秒', labelMillis: '毫秒', copy: '复制', copied: '已复制',
+      invalidTs: '不是有效的时间戳',
+      seoH1: '免费在线 Unix 时间戳转换工具',
+      seoIntro: '将 Unix 时间戳转换为可读日期，或将日期转换为 Unix 时间戳。完全在您的浏览器中运行。',
+      seoToggle: '常见问题', faqH2: '常见问题',
+      faq1Q: 'Unix 时间戳是秒还是毫秒？',
+      faq1A: '经典的 Unix 时间戳是自1970年1月1日 UTC 以来的秒数。许多 API 和 JavaScript 的 Date.now() 使用的是毫秒。此工具会根据长度自动判断您输入的是哪一种。',
+      faq2Q: '显示的是本地时间还是 UTC？',
+      faq2A: '两者都有。结果会同时显示您浏览器的本地时间、UTC 时间以及 ISO 8601 字符串。',
+      faq3Q: '我的输入会被发送到服务器吗？',
+      faq3A: '不会。转换完全通过浏览器的标准 JavaScript Date API 在本地完成。',
+      footerPrivacy: '隐私政策', footerTerms: '服务条款'
+    },
+    ja: {
+      nowLabel: '現在の Unix タイムスタンプ', tsInputLabel: 'Unix タイムスタンプ（秒またはミリ秒）',
+      dateInputLabel: '日時を選択（ローカル時間）',
+      toDateH2: 'タイムスタンプ → 日付', toTsH2: '日付 → タイムスタンプ',
+      labelLocal: 'ローカル時間', labelUtc: 'UTC', labelIso: 'ISO 8601', labelRelative: '相対時間',
+      labelSeconds: '秒', labelMillis: 'ミリ秒', copy: 'コピー', copied: 'コピーしました',
+      invalidTs: '有効なタイムスタンプではありません',
+      seoH1: '無料オンライン Unix タイムスタンプ変換ツール',
+      seoIntro: 'Unix タイムスタンプを読みやすい日付に、または日付を Unix タイムスタンプに変換します。すべてブラウザ内で処理されます。',
+      seoToggle: 'よくある質問', faqH2: 'よくある質問',
+      faq1Q: 'Unix タイムスタンプは秒ですか、ミリ秒ですか？',
+      faq1A: '一般的な Unix タイムスタンプは1970年1月1日 UTC からの秒数です。多くの API や JavaScript の Date.now() はミリ秒を使います。このツールは桁数から自動的に判別します。',
+      faq2Q: 'ローカル時間と UTC のどちらが表示されますか？',
+      faq2A: '両方です。ブラウザのローカル時間、UTC 時間、ISO 8601 形式の文字列がすべて表示されます。',
+      faq3Q: '入力した内容はサーバーに送信されますか？',
+      faq3A: 'いいえ。変換は標準の JavaScript Date API を使ってブラウザ内で完結します。',
+      footerPrivacy: 'プライバシーポリシー', footerTerms: '利用規約'
+    },
+    ko: {
+      nowLabel: '현재 Unix 타임스탬프', tsInputLabel: 'Unix 타임스탬프 (초 또는 밀리초)',
+      dateInputLabel: '날짜와 시간 선택 (로컬 시간)',
+      toDateH2: '타임스탬프 → 날짜', toTsH2: '날짜 → 타임스탬프',
+      labelLocal: '로컬 시간', labelUtc: 'UTC', labelIso: 'ISO 8601', labelRelative: '상대 시간',
+      labelSeconds: '초', labelMillis: '밀리초', copy: '복사', copied: '복사됨',
+      invalidTs: '유효한 타임스탬프가 아니에요',
+      seoH1: '무료 온라인 Unix 타임스탬프 변환기',
+      seoIntro: 'Unix 타임스탬프를 읽기 쉬운 날짜로, 또는 날짜를 Unix 타임스탬프로 변환해요. 전부 브라우저 안에서 처리됩니다.',
+      seoToggle: 'FAQ', faqH2: '자주 묻는 질문',
+      faq1Q: 'Unix 타임스탬프는 초인가요, 밀리초인가요?',
+      faq1A: '전통적인 Unix 타임스탬프는 1970년 1월 1일 UTC부터의 초 단위예요. 많은 API와 JavaScript의 Date.now()는 밀리초를 써요. 이 도구는 자릿수를 보고 자동으로 판별해요.',
+      faq2Q: '로컬 시간이 나오나요, UTC가 나오나요?',
+      faq2A: '둘 다 나와요. 브라우저의 로컬 시간, UTC 시간, ISO 8601 문자열까지 모두 보여드려요.',
+      faq3Q: '입력한 내용이 서버로 전송되나요?',
+      faq3A: '아니요. 변환은 표준 JavaScript Date API로 브라우저 안에서만 처리돼요.',
+      footerPrivacy: '개인정보처리방침', footerTerms: '이용약관'
+    }
+  };
+
+  function t(){ return translations[uiLang]; }
+
+  function applyLanguage(lang){
+    uiLang = lang;
+    document.documentElement.lang = lang;
+    const d = t();
+    nowLabel.textContent = d.nowLabel;
+    tsInputLabel.textContent = d.tsInputLabel;
+    dateInputLabel.textContent = d.dateInputLabel;
+    toDateH2.textContent = d.toDateH2;
+    toTsH2.textContent = d.toTsH2;
+    labelLocal.textContent = d.labelLocal;
+    labelUtc.textContent = d.labelUtc;
+    labelIso.textContent = d.labelIso;
+    labelRelative.textContent = d.labelRelative;
+    labelSeconds.textContent = d.labelSeconds;
+    labelMillis.textContent = d.labelMillis;
+    copyIso.textContent = d.copy;
+    copySeconds.textContent = d.copy;
+    copyMillis.textContent = d.copy;
+    seoH1.textContent = d.seoH1;
+    seoIntro.textContent = d.seoIntro;
+    seoToggle.textContent = d.seoToggle;
+    faqH2.textContent = d.faqH2;
+    faq1Q.textContent = d.faq1Q; faq1A.textContent = d.faq1A;
+    faq2Q.textContent = d.faq2Q; faq2A.textContent = d.faq2A;
+    faq3Q.textContent = d.faq3Q; faq3A.textContent = d.faq3A;
+    footerPrivacy.textContent = d.footerPrivacy;
+    footerTerms.textContent = d.footerTerms;
+    updateFromTsInput();
+  }
+
+  uiLangSelect.addEventListener('change', (e) => {
+    applyLanguage(e.target.value);
+    DevWrightSite.saveSharedLang(e.target.value);
+  });
+
+  function formatRelative(deltaMs){
+    const abs = Math.abs(deltaMs);
+    const sec = Math.round(abs / 1000);
+    const units = [
+      ['year', 31536000], ['month', 2592000], ['day', 86400],
+      ['hour', 3600], ['minute', 60], ['second', 1]
+    ];
+    for(const [name, secs] of units){
+      if(sec >= secs || name === 'second'){
+        const val = Math.floor(sec / secs);
+        const suffix = deltaMs < 0 ? 'ago' : 'from now';
+        return val + ' ' + name + (val !== 1 ? 's' : '') + ' ' + suffix;
+      }
+    }
+  }
+
+  function updateFromTsInput(){
+    const raw = tsInput.value.trim();
+    if(!raw){
+      [outLocal, outUtc, outIso, outRelative].forEach(el => { el.textContent = '—'; el.classList.add('empty'); });
+      tsError.textContent = '';
+      return;
+    }
+    if(!/^-?\d+(\.\d+)?$/.test(raw)){
+      tsError.textContent = t().invalidTs;
+      [outLocal, outUtc, outIso, outRelative].forEach(el => { el.textContent = '—'; el.classList.add('empty'); });
+      return;
+    }
+    tsError.textContent = '';
+    const num = parseFloat(raw);
+    const ms = Math.abs(num) > 1e12 ? num : num * 1000;
+    const date = new Date(ms);
+    if(isNaN(date.getTime())){
+      tsError.textContent = t().invalidTs;
+      return;
+    }
+    outLocal.textContent = date.toLocaleString();
+    outUtc.textContent = date.toUTCString();
+    outIso.textContent = date.toISOString();
+    outRelative.textContent = formatRelative(ms - Date.now());
+    [outLocal, outUtc, outIso, outRelative].forEach(el => el.classList.remove('empty'));
+  }
+  tsInput.addEventListener('input', updateFromTsInput);
+
+  function updateFromDateInput(){
+    if(!dateInput.value){
+      [outSeconds, outMillis].forEach(el => { el.textContent = '—'; el.classList.add('empty'); });
+      return;
+    }
+    const date = new Date(dateInput.value);
+    const ms = date.getTime();
+    outSeconds.textContent = Math.floor(ms / 1000);
+    outMillis.textContent = ms;
+    [outSeconds, outMillis].forEach(el => el.classList.remove('empty'));
+  }
+  dateInput.addEventListener('input', updateFromDateInput);
+
+  [[copyIso, outIso], [copySeconds, outSeconds], [copyMillis, outMillis]].forEach(([btn, valEl]) => {
+    btn.addEventListener('click', async () => {
+      if(!valEl.textContent || valEl.textContent === '—') return;
+      const ok = await DevWrightSite.copyTextToClipboard(valEl.textContent);
+      if(ok){
+        const orig = btn.textContent;
+        btn.textContent = t().copied;
+        setTimeout(() => { btn.textContent = orig; }, 1200);
+      }
+    });
+  });
+
+  function tickNow(){
+    nowValue.textContent = Math.floor(Date.now() / 1000);
+  }
+  tickNow();
+  setInterval(tickNow, 1000);
+
+  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+  const appLayoutEl = document.querySelector('.app-layout');
+  DevWrightSite.setupThemeToggle(themeToggle, 'light');
+  DevWrightSite.setupSidebar(sidebarToggleBtn, appLayoutEl);
+  const initialLang = DevWrightSite.getSharedLang('en');
+  uiLangSelect.value = initialLang;
+  applyLanguage(initialLang);
+</script>
+</body>
+</html>

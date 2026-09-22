@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curl Command to Code Converter — Python, JS, Go, PHP & More</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%94%A8</text></svg>">
+<meta name="description" content="Paste a curl command (e.g. copied from your browser's Network tab) and instantly get equivalent code in Python, JavaScript, Node.js, PHP, Go, Java, Ruby, C#, PowerShell, or Rust. Runs entirely in your browser.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://dev-joohyun.github.io/devwright/curl-converter.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<link rel="stylesheet" href="site.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DevWright Curl Command Converter",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any (Web browser)",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free online tool to convert a curl command into equivalent code in Python, JavaScript, Node.js, PHP, Go, Java, Ruby, C#, PowerShell, or Rust."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I copy a request as curl from my browser?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Open your browser's developer tools (F12), go to the Network tab, make the request, then right-click it and choose 'Copy' > 'Copy as cURL'. Paste the result into this tool." }
+    },
+    {
+      "@type": "Question",
+      "name": "Which curl options are supported?",
+      "acceptedAnswer": { "@type": "Answer", "text": "This tool understands the options browsers actually generate: the URL, -X/--request, -H/--header, -d/--data and its variants, -F/--form for multipart uploads, -b/--cookie, -u/--user for basic auth, -G/--get, -A/--user-agent, and multi-line commands with backslash continuations." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my curl command sent to a server?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Parsing and code generation both happen locally in your browser with JavaScript — nothing is uploaded anywhere. This matters since curl commands often contain auth tokens or cookies." }
+    }
+  ]
+}
+</script>
+<style>
+  main{ flex:1; display:flex; flex-direction:column; max-width:920px; margin:0 auto; width:100%; padding:32px 24px; gap:20px; }
+  h1{ font-size:18px; margin:0; }
+  .intro{ color:var(--muted); font-size:13px; margin:0; line-height:1.6; }
+
+  .field-label{ font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; }
+  textarea{
+    width:100%; min-height:140px; resize:vertical; border:1px solid var(--line); border-radius:8px;
+    background:var(--panel); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:13px;
+    padding:14px; line-height:1.6;
+  }
+  textarea:focus{ outline:none; border-color:var(--border-hover); }
+
+  .error-text{ color:var(--error); font-size:12.5px; }
+
+  .lang-tabs{
+    display:flex; gap:4px; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    background:var(--panel); padding:4px; border-radius:8px; border:1px solid var(--border-strong);
+  }
+  .lang-tab{
+    padding:7px 14px; font-size:12px; font-weight:600; color:var(--muted); background:transparent;
+    border:none; border-radius:6px; cursor:pointer; white-space:nowrap; font-family:'JetBrains Mono',monospace;
+  }
+  .lang-tab:hover{ color:var(--text); }
+  .lang-tab.active{ background:var(--panel-2); color:var(--text); box-shadow:inset 0 0 0 1px var(--border-strong); }
+
+  .output-wrap{ position:relative; }
+  .output{
+    margin:0; padding:16px; border:1px solid var(--line); border-radius:8px; background:var(--panel);
+    font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.6; overflow-x:auto;
+    white-space:pre; color:var(--text); min-height:200px;
+  }
+  .output-actions{ position:absolute; top:10px; right:10px; display:flex; gap:8px; }
+  .icon-btn{
+    background:var(--panel-2); border:1px solid var(--border-strong); color:var(--muted);
+    font-size:11px; padding:6px 12px; border-radius:6px; cursor:pointer;
+  }
+  .icon-btn:hover{ color:var(--text); border-color:var(--border-hover); }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><a href="index.html"><span class="brand-mark">DevWright</span></a></div>
+    <div class="sidebar-group-label">Format</div>
+    <a href="code-formatter.html" class="sidebar-link">Code Formatter</a>
+    <a href="yaml-json.html" class="sidebar-link">YAML ↔ JSON</a>
+    <div class="sidebar-group-label">Encode / Decode</div>
+    <a href="base64-tool.html" class="sidebar-link">Base64</a>
+    <a href="url-encoder.html" class="sidebar-link">URL Encoder</a>
+    <a href="jwt-decoder.html" class="sidebar-link">JWT Decoder</a>
+    <div class="sidebar-group-label">Generate</div>
+    <a href="hash-generator.html" class="sidebar-link">Hash Generator</a>
+    <a href="uuid-generator.html" class="sidebar-link">UUID Generator</a>
+    <div class="sidebar-group-label">Convert</div>
+    <a href="unix-timestamp.html" class="sidebar-link">Unix Timestamp</a>
+    <a href="color-converter.html" class="sidebar-link">Color Converter</a>
+    <a href="curl-converter.html" class="sidebar-link active" aria-current="page">Curl Converter</a>
+    <div class="sidebar-group-label">Test</div>
+    <a href="regex-tester.html" class="sidebar-link">Regex Tester</a>
+  </aside>
+
+  <div class="content-col">
+<header>
+  <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle sidebar" title="Collapse sidebar">☰</button>
+  <div class="header-settings">
+    <select class="lang-select" id="uiLangSelect">
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+    </select>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main>
+  <h1 id="seoH1">Curl Command to Code Converter</h1>
+  <p class="intro" id="seoIntro">Paste a curl command — copied from your browser's Network tab — and get equivalent code in the language of your choice. Runs entirely in your browser.</p>
+
+  <div>
+    <div class="field-label" id="inputLabel">Curl command</div>
+    <textarea id="curlInput" spellcheck="false" placeholder="curl 'https://api.example.com/users' -H 'authorization: Bearer ...' --data-raw '{&quot;name&quot;:&quot;Ada&quot;}'"></textarea>
+    <div class="error-text" id="errorText" style="display:none;"></div>
+  </div>
+
+  <div class="lang-tabs" id="langTabs">
+    <button class="lang-tab active" data-lang="python">Python</button>
+    <button class="lang-tab" data-lang="jsfetch">JavaScript</button>
+    <button class="lang-tab" data-lang="node">Node.js</button>
+    <button class="lang-tab" data-lang="php">PHP</button>
+    <button class="lang-tab" data-lang="go">Go</button>
+    <button class="lang-tab" data-lang="java">Java</button>
+    <button class="lang-tab" data-lang="ruby">Ruby</button>
+    <button class="lang-tab" data-lang="csharp">C#</button>
+    <button class="lang-tab" data-lang="powershell">PowerShell</button>
+    <button class="lang-tab" data-lang="rust">Rust</button>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-actions">
+      <button class="icon-btn" id="copyBtn">Copy</button>
+    </div>
+    <pre class="output" id="outputCode">—</pre>
+  </div>
+
+  <details class="seo-more">
+    <summary id="seoToggle">FAQ</summary>
+    <h2 id="faqH2">Frequently asked questions</h2>
+    <details><summary id="faq1Q">How do I copy a request as curl from my browser?</summary><p id="faq1A">Open your browser's developer tools (F12), go to the Network tab, make the request, then right-click it and choose "Copy" &gt; "Copy as cURL". Paste the result into this tool.</p></details>
+    <details><summary id="faq2Q">Which curl options are supported?</summary><p id="faq2A">This tool understands the options browsers actually generate: the URL, -X/--request, -H/--header, -d/--data and its variants, -F/--form for multipart uploads, -b/--cookie, -u/--user for basic auth, -G/--get, -A/--user-agent, and multi-line commands with backslash continuations.</p></details>
+    <details><summary id="faq3Q">Is my curl command sent to a server?</summary><p id="faq3A">No. Parsing and code generation both happen locally in your browser with JavaScript — nothing is uploaded anywhere. This matters since curl commands often contain auth tokens or cookies.</p></details>
+  </details>
+</main>
+
+<div class="site-footer">
+  <span id="footerCopyright">© 2026 DevWright</span>
+  <a href="index.html#privacy" id="footerPrivacy">Privacy Policy</a>
+  <a href="index.html#terms" id="footerTerms">Terms of Service</a>
+</div>
+
+  </div>
+</div>
+
+<script src="site.js"></script>
+<script>
+// ============ Curl parser (see project notes: tested against 7+ real-world patterns) ============
+function tokenizeCurlCommand(input) {
+  let str = input.replace(/\\\r?\n/g, ' ').replace(/\^\r?\n/g, ' ');
+  const tokens = [];
+  let i = 0;
+  const n = str.length;
+  while (i < n) {
+    while (i < n && /\s/.test(str[i])) i++;
+    if (i >= n) break;
+    let token = '';
+    let inSingle = false, inDouble = false;
+    while (i < n) {
+      const c = str[i];
+      if (inSingle) { if (c === "'") { inSingle = false; i++; continue; } token += c; i++; continue; }
+      if (inDouble) {
+        if (c === '"') { inDouble = false; i++; continue; }
+        if (c === '\\' && i + 1 < n && '"\\$`'.includes(str[i + 1])) { token += str[i + 1]; i += 2; continue; }
+        token += c; i++; continue;
+      }
+      if (c === "'") { inSingle = true; i++; continue; }
+      if (c === '"') { inDouble = true; i++; continue; }
+      if (c === '\\' && i + 1 < n) { token += str[i + 1]; i += 2; continue; }
+      if (/\s/.test(c)) break;
+      token += c; i++;
+    }
+    tokens.push(token);
+  }
+  return tokens;
+}
+
+const VALUE_FLAGS = new Set([
+  '-X', '--request', '-H', '--header', '-d', '--data', '--data-raw', '--data-binary',
+  '--data-ascii', '--data-urlencode', '-b', '--cookie', '-u', '--user', '-A', '--user-agent',
+  '-e', '--referer', '-F', '--form', '--url', '--connect-timeout', '--max-time', '--cert', '--key',
+]);
+
+function parseCurlCommand(input) {
+  let tokens = tokenizeCurlCommand(input.trim());
+  if (tokens[0] === 'curl') tokens = tokens.slice(1);
+
+  const result = {
+    method: null, url: null, headers: [], data: [], dataIsBinary: false, forms: [],
+    cookies: null, auth: null, userAgent: null, referer: null, isGet: false,
+    insecure: false, compressed: false,
+  };
+
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    const next = () => tokens[++i];
+    if (t === '-X' || t === '--request') { result.method = next(); continue; }
+    if (t === '-H' || t === '--header') {
+      const h = next(); const idx = h.indexOf(':');
+      if (idx !== -1) result.headers.push([h.slice(0, idx).trim(), h.slice(idx + 1).trim()]);
+      continue;
+    }
+    if (t === '-d' || t === '--data' || t === '--data-ascii' || t === '--data-raw' || t === '--data-urlencode') { result.data.push(next()); continue; }
+    if (t === '--data-binary') { result.data.push(next()); result.dataIsBinary = true; continue; }
+    if (t === '-F' || t === '--form') {
+      const f = next(); const idx = f.indexOf('=');
+      const name = idx !== -1 ? f.slice(0, idx) : f;
+      let value = idx !== -1 ? f.slice(idx + 1) : '';
+      const isFile = value.startsWith('@');
+      if (isFile) value = value.slice(1);
+      result.forms.push([name, value, isFile]);
+      continue;
+    }
+    if (t === '-b' || t === '--cookie') { result.cookies = next(); continue; }
+    if (t === '-u' || t === '--user') {
+      const val = next(); const idx = val.indexOf(':');
+      result.auth = idx !== -1 ? { user: val.slice(0, idx), pass: val.slice(idx + 1) } : { user: val, pass: '' };
+      continue;
+    }
+    if (t === '-A' || t === '--user-agent') { result.userAgent = next(); continue; }
+    if (t === '-e' || t === '--referer') { result.referer = next(); continue; }
+    if (t === '-G' || t === '--get') { result.isGet = true; continue; }
+    if (t === '-k' || t === '--insecure') { result.insecure = true; continue; }
+    if (t === '--compressed') { result.compressed = true; continue; }
+    if (t === '--url') { result.url = next(); continue; }
+    if (t === '-L' || t === '--location' || t === '-s' || t === '--silent' || t === '-v' || t === '--verbose' || t === '-i' || t === '--include') { continue; }
+    if (VALUE_FLAGS.has(t)) { next(); continue; }
+    if (t.startsWith('-')) { continue; }
+    if (!result.url) result.url = t;
+  }
+
+  let method = result.method;
+  if (!method) method = (result.forms.length > 0 || result.data.length > 0) ? 'POST' : 'GET';
+  result.method = method.toUpperCase();
+
+  result.body = result.data.length > 0 ? result.data.join('&') : null;
+
+  if (result.isGet && result.body) {
+    const sep = result.url && result.url.includes('?') ? '&' : '?';
+    result.url = (result.url || '') + sep + result.body;
+    result.body = null;
+    result.method = 'GET';
+  }
+
+  const contentTypeHeader = result.headers.find(([n]) => n.toLowerCase() === 'content-type');
+  result.isJsonBody = !!(result.body && (
+    (contentTypeHeader && /application\/json/i.test(contentTypeHeader[1])) ||
+    (!contentTypeHeader && /^\s*[\{\[]/.test(result.body))
+  ));
+  if (result.isJsonBody) {
+    try { result.jsonBody = JSON.parse(result.body); } catch (e) { result.isJsonBody = false; }
+  }
+  return result;
+}
+
+// ============ Code generators ============
+function pyStr(s){ return "'" + String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'") + "'"; }
+function jsStr(s){ return "'" + String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'") + "'"; }
+function jsonPretty(obj){ return JSON.stringify(obj, null, 2); }
+function phpStr(s){ return "'" + String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'") + "'"; }
+function goStr(s){ return JSON.stringify(String(s)); }
+function javaStr(s){ return JSON.stringify(String(s)); }
+function rubyStr(s){ return "'" + String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'") + "'"; }
+function csharpStr(s){ return JSON.stringify(String(s)); }
+function rustStr(s){ return JSON.stringify(String(s)); }
+function psStr(s){ return "'" + String(s).replace(/'/g,"''") + "'"; }
+
+function headerList(req) {
+  const list = [...req.headers];
+  if (req.userAgent) list.push(['User-Agent', req.userAgent]);
+  if (req.referer) list.push(['Referer', req.referer]);
+  if (req.cookies) list.push(['Cookie', req.cookies]);
+  return list;
+}
+
+function toPython(req) {
+  const lines = ["import requests", ""];
+  const headers = headerList(req).filter(([n]) => n.toLowerCase() !== 'cookie');
+  if (headers.length) {
+    lines.push('headers = {');
+    headers.forEach(([n, v]) => lines.push(`    ${pyStr(n)}: ${pyStr(v)},`));
+    lines.push('}');
+  }
+  if (req.cookies) {
+    lines.push('cookies = {');
+    req.cookies.split(';').forEach(pair => {
+      const idx = pair.indexOf('=');
+      if (idx === -1) return;
+      lines.push(`    ${pyStr(pair.slice(0, idx).trim())}: ${pyStr(pair.slice(idx + 1).trim())},`);
+    });
+    lines.push('}');
+  }
+  if (req.forms.length) {
+    const fileFields = req.forms.filter(f => f[2]);
+    const dataFields = req.forms.filter(f => !f[2]);
+    if (fileFields.length) {
+      lines.push('files = {');
+      fileFields.forEach(([n, v]) => lines.push(`    ${pyStr(n)}: open(${pyStr(v)}, 'rb'),`));
+      lines.push('}');
+    }
+    if (dataFields.length) {
+      lines.push('data = {');
+      dataFields.forEach(([n, v]) => lines.push(`    ${pyStr(n)}: ${pyStr(v)},`));
+      lines.push('}');
+    }
+  } else if (req.isJsonBody) {
+    lines.push(`json_data = ${jsonPretty(req.jsonBody)}`);
+  } else if (req.body) {
+    lines.push(`data = ${pyStr(req.body)}`);
+  }
+  const args = [pyStr(req.url || '')];
+  if (headers.length) args.push('headers=headers');
+  if (req.cookies) args.push('cookies=cookies');
+  if (req.auth) args.push(`auth=(${pyStr(req.auth.user)}, ${pyStr(req.auth.pass)})`);
+  if (req.forms.length) {
+    if (req.forms.some(f => f[2])) args.push('files=files');
+    if (req.forms.some(f => !f[2])) args.push('data=data');
+  } else if (req.isJsonBody) args.push('json=json_data');
+  else if (req.body) args.push('data=data');
+  lines.push('');
+  lines.push(`response = requests.${req.method.toLowerCase()}(${args.join(', ')})`);
+  lines.push('print(response.text)');
+  return lines.join('\n');
+}
+
+function toJsFetch(req) {
+  const lines = [];
+  const headers = headerList(req);
+  if (headers.length) {
+    lines.push('const headers = {');
+    headers.forEach(([n, v]) => lines.push(`  ${jsStr(n)}: ${jsStr(v)},`));
+    lines.push('};'); lines.push('');
+  }
+  let bodyExpr = null;
+  if (req.forms.length) {
+    lines.push('const formData = new FormData();');
+    req.forms.forEach(([n, v, isFile]) => {
+      if (isFile) lines.push(`formData.append(${jsStr(n)}, fileInput.files[0]); // was: @${v}`);
+      else lines.push(`formData.append(${jsStr(n)}, ${jsStr(v)});`);
+    });
+    lines.push('');
+    bodyExpr = 'formData';
+  } else if (req.isJsonBody) bodyExpr = `JSON.stringify(${jsonPretty(req.jsonBody)})`;
+  else if (req.body) bodyExpr = jsStr(req.body);
+
+  const options = [`  method: ${jsStr(req.method)},`];
+  if (headers.length) options.push('  headers,');
+  if (bodyExpr) options.push(`  body: ${bodyExpr},`);
+  lines.push(`fetch(${jsStr(req.url || '')}, {`);
+  lines.push(...options);
+  lines.push('})');
+  lines.push('  .then(response => response.text())');
+  lines.push('  .then(data => console.log(data))');
+  lines.push('  .catch(error => console.error(error));');
+  return lines.join('\n');
+}
+
+function toNodeAxios(req) {
+  const lines = ["const axios = require('axios');", ''];
+  const headers = headerList(req);
+  if (headers.length) {
+    lines.push('const headers = {');
+    headers.forEach(([n, v]) => lines.push(`  ${jsStr(n)}: ${jsStr(v)},`));
+    lines.push('};'); lines.push('');
+  }
+  let dataExpr = null;
+  if (req.isJsonBody) dataExpr = jsonPretty(req.jsonBody);
+  else if (req.body) dataExpr = jsStr(req.body);
+  lines.push('axios({');
+  lines.push(`  method: ${jsStr(req.method.toLowerCase())},`);
+  lines.push(`  url: ${jsStr(req.url || '')},`);
+  if (headers.length) lines.push('  headers,');
+  if (req.auth) lines.push(`  auth: { username: ${jsStr(req.auth.user)}, password: ${jsStr(req.auth.pass)} },`);
+  if (dataExpr) lines.push(`  data: ${dataExpr},`);
+  lines.push('})');
+  lines.push('  .then(response => console.log(response.data))');
+  lines.push('  .catch(error => console.error(error));');
+  return lines.join('\n');
+}
+
+function toPhp(req) {
+  const lines = ['<?php', '', '$ch = curl_init();', ''];
+  lines.push(`curl_setopt($ch, CURLOPT_URL, ${phpStr(req.url || '')});`);
+  lines.push('curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);');
+  lines.push(`curl_setopt($ch, CURLOPT_CUSTOMREQUEST, ${phpStr(req.method)});`);
+  const headers = headerList(req).filter(([n]) => n.toLowerCase() !== 'cookie');
+  if (headers.length) {
+    lines.push('curl_setopt($ch, CURLOPT_HTTPHEADER, [');
+    headers.forEach(([n, v]) => lines.push(`    ${phpStr(`${n}: ${v}`)},`));
+    lines.push(']);');
+  }
+  if (req.cookies) lines.push(`curl_setopt($ch, CURLOPT_COOKIE, ${phpStr(req.cookies)});`);
+  if (req.auth) lines.push(`curl_setopt($ch, CURLOPT_USERPWD, ${phpStr(`${req.auth.user}:${req.auth.pass}`)});`);
+  if (req.forms.length) {
+    lines.push('$postFields = [');
+    req.forms.forEach(([n, v, isFile]) => {
+      const val = isFile ? `new CURLFile(${phpStr(v)})` : phpStr(v);
+      lines.push(`    ${phpStr(n)} => ${val},`);
+    });
+    lines.push('];');
+    lines.push('curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);');
+  } else if (req.body) {
+    lines.push(`curl_setopt($ch, CURLOPT_POSTFIELDS, ${phpStr(req.body)});`);
+  }
+  lines.push(''); lines.push('$response = curl_exec($ch);'); lines.push('curl_close($ch);');
+  lines.push(''); lines.push('echo $response;');
+  return lines.join('\n');
+}
+
+function toGo(req) {
+  const hasBody = !!req.body && !req.forms.length;
+  const lines = ['package main', '', 'import (', '\t"fmt"', '\t"io"', '\t"net/http"'];
+  if (hasBody) lines.push('\t"strings"');
+  lines.push(')', '', 'func main() {');
+  if (hasBody) {
+    lines.push(`\tpayload := strings.NewReader(${goStr(req.body)})`);
+    lines.push(`\treq, err := http.NewRequest(${goStr(req.method)}, ${goStr(req.url || '')}, payload)`);
+  } else {
+    lines.push(`\treq, err := http.NewRequest(${goStr(req.method)}, ${goStr(req.url || '')}, nil)`);
+  }
+  lines.push('\tif err != nil {', '\t\tfmt.Println(err)', '\t\treturn', '\t}', '');
+  headerList(req).forEach(([n, v]) => lines.push(`\treq.Header.Add(${goStr(n)}, ${goStr(v)})`));
+  if (req.auth) lines.push(`\treq.SetBasicAuth(${goStr(req.auth.user)}, ${goStr(req.auth.pass)})`);
+  lines.push('', '\tclient := &http.Client{}', '\tres, err := client.Do(req)');
+  lines.push('\tif err != nil {', '\t\tfmt.Println(err)', '\t\treturn', '\t}');
+  lines.push('\tdefer res.Body.Close()', '');
+  lines.push('\tbody, _ := io.ReadAll(res.Body)', '\tfmt.Println(string(body))', '}');
+  return lines.join('\n');
+}
+
+function toJava(req) {
+  const lines = [
+    'import java.net.URI;', 'import java.net.http.HttpClient;', 'import java.net.http.HttpRequest;',
+    'import java.net.http.HttpRequest.BodyPublishers;', 'import java.net.http.HttpResponse;',
+    'import java.util.Base64;', '',
+    'public class Main {', '    public static void main(String[] args) throws Exception {',
+    '        HttpClient client = HttpClient.newHttpClient();', '',
+    '        HttpRequest.Builder builder = HttpRequest.newBuilder()',
+    `            .uri(URI.create(${javaStr(req.url || '')}))`,
+  ];
+  headerList(req).forEach(([n, v]) => lines.push(`            .header(${javaStr(n)}, ${javaStr(v)})`));
+  if (req.auth) {
+    const b64 = `Base64.getEncoder().encodeToString(${javaStr(req.auth.user + ':' + req.auth.pass)}.getBytes())`;
+    lines.push(`            .header("Authorization", "Basic " + ${b64})`);
+  }
+  if (req.body) lines.push(`            .method(${javaStr(req.method)}, BodyPublishers.ofString(${javaStr(req.body)}))`);
+  else if (req.method === 'GET') lines.push('            .GET()');
+  else lines.push(`            .method(${javaStr(req.method)}, BodyPublishers.noBody())`);
+  lines.push('            ;', '', '        HttpRequest request = builder.build();');
+  lines.push('        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());');
+  lines.push('', '        System.out.println(response.body());', '    }', '}');
+  return lines.join('\n');
+}
+
+function toRuby(req) {
+  const lines = ["require 'net/http'", "require 'uri'", ''];
+  lines.push(`uri = URI(${rubyStr(req.url || '')})`);
+  lines.push('http = Net::HTTP.new(uri.host, uri.port)');
+  lines.push("http.use_ssl = (uri.scheme == 'https')", '');
+  const methodClass = { GET: 'Get', POST: 'Post', PUT: 'Put', DELETE: 'Delete', PATCH: 'Patch' }[req.method] || 'Get';
+  lines.push(`request = Net::HTTP::${methodClass}.new(uri)`);
+  headerList(req).forEach(([n, v]) => lines.push(`request[${rubyStr(n)}] = ${rubyStr(v)}`));
+  if (req.auth) lines.push(`request.basic_auth(${rubyStr(req.auth.user)}, ${rubyStr(req.auth.pass)})`);
+  if (req.body) lines.push(`request.body = ${rubyStr(req.body)}`);
+  lines.push('', 'response = http.request(request)', 'puts response.read_body');
+  return lines.join('\n');
+}
+
+function toCsharp(req) {
+  const lines = [
+    'using System;', 'using System.Net.Http;', 'using System.Net.Http.Headers;',
+    'using System.Text;', 'using System.Threading.Tasks;', '',
+    'class Program', '{', '    static async Task Main()', '    {',
+    '        var client = new HttpClient();',
+    `        var request = new HttpRequestMessage(new HttpMethod(${csharpStr(req.method)}), ${csharpStr(req.url || '')});`, '',
+  ];
+  headerList(req).filter(([n]) => n.toLowerCase() !== 'content-type').forEach(([n, v]) =>
+    lines.push(`        request.Headers.TryAddWithoutValidation(${csharpStr(n)}, ${csharpStr(v)});`));
+  if (req.auth) {
+    lines.push(`        var authBytes = Encoding.UTF8.GetBytes(${csharpStr(req.auth.user + ':' + req.auth.pass)});`);
+    lines.push('        request.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(authBytes));');
+  }
+  if (req.body) {
+    const ct = req.headers.find(([n]) => n.toLowerCase() === 'content-type');
+    const contentType = req.isJsonBody ? 'application/json' : (ct ? ct[1] : 'text/plain');
+    lines.push(`        request.Content = new StringContent(${csharpStr(req.body)}, Encoding.UTF8, ${csharpStr(contentType)});`);
+  }
+  lines.push('', '        var response = await client.SendAsync(request);');
+  lines.push('        var body = await response.Content.ReadAsStringAsync();');
+  lines.push('        Console.WriteLine(body);', '    }', '}');
+  return lines.join('\n');
+}
+
+function toPowerShell(req) {
+  const lines = [];
+  const headers = headerList(req);
+  if (headers.length) {
+    lines.push('$headers = @{');
+    headers.forEach(([n, v]) => lines.push(`    ${psStr(n)} = ${psStr(v)}`));
+    lines.push('}'); lines.push('');
+  }
+  const parts = [`-Uri ${psStr(req.url || '')}`, `-Method ${req.method}`];
+  if (headers.length) parts.push('-Headers $headers');
+  if (req.auth) {
+    lines.push(`$pair = ${psStr(req.auth.user + ':' + req.auth.pass)}`);
+    lines.push('$creds = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($pair))');
+    parts.push('-Headers @{ Authorization = "Basic $creds" }');
+  }
+  if (req.body) parts.push(`-Body ${psStr(req.body)}`);
+  if (req.isJsonBody) parts.push('-ContentType "application/json"');
+  lines.push('Invoke-RestMethod ' + parts.join(' `\n    '));
+  return lines.join('\n');
+}
+
+function toRust(req) {
+  const lines = [
+    '#[tokio::main]', 'async fn main() -> Result<(), Box<dyn std::error::Error>> {',
+    '    let client = reqwest::Client::new();', '',
+  ];
+  lines.push(`    let mut request = client.${req.method.toLowerCase()}(${rustStr(req.url || '')});`);
+  headerList(req).forEach(([n, v]) => lines.push(`    request = request.header(${rustStr(n)}, ${rustStr(v)});`));
+  if (req.auth) lines.push(`    request = request.basic_auth(${rustStr(req.auth.user)}, Some(${rustStr(req.auth.pass)}));`);
+  if (req.body) lines.push(`    request = request.body(${rustStr(req.body)});`);
+  lines.push('', '    let response = request.send().await?;');
+  lines.push('    let body = response.text().await?;');
+  lines.push('    println!("{}", body);', '', '    Ok(())', '}');
+  return lines.join('\n');
+}
+
+const GENERATORS = {
+  python: toPython, jsfetch: toJsFetch, node: toNodeAxios, php: toPhp, go: toGo,
+  java: toJava, ruby: toRuby, csharp: toCsharp, powershell: toPowerShell, rust: toRust,
+};
+
+// ============ Page wiring ============
+const uiLangSelect = document.getElementById('uiLangSelect');
+const themeToggle = document.getElementById('themeToggle');
+const inputLabel = document.getElementById('inputLabel');
+const curlInput = document.getElementById('curlInput');
+const errorText = document.getElementById('errorText');
+const langTabs = document.getElementById('langTabs');
+const outputCode = document.getElementById('outputCode');
+const copyBtn = document.getElementById('copyBtn');
+
+const seoH1 = document.getElementById('seoH1');
+const seoIntro = document.getElementById('seoIntro');
+const seoToggle = document.getElementById('seoToggle');
+const faqH2 = document.getElementById('faqH2');
+const faq1Q = document.getElementById('faq1Q'), faq1A = document.getElementById('faq1A');
+const faq2Q = document.getElementById('faq2Q'), faq2A = document.getElementById('faq2A');
+const faq3Q = document.getElementById('faq3Q'), faq3A = document.getElementById('faq3A');
+const footerPrivacy = document.getElementById('footerPrivacy');
+const footerTerms = document.getElementById('footerTerms');
+
+let uiLang = 'en';
+let currentLangKey = 'python';
+
+const translations = {
+  en: {
+    inputLabel: 'Curl command', copy: 'Copy', copied: 'Copied', invalid: "Couldn't find a URL in this command",
+    seoH1: 'Curl Command to Code Converter',
+    seoIntro: "Paste a curl command — copied from your browser's Network tab — and get equivalent code in the language of your choice. Runs entirely in your browser.",
+    seoToggle: 'FAQ', faqH2: 'Frequently asked questions',
+    faq1Q: 'How do I copy a request as curl from my browser?',
+    faq1A: 'Open your browser\'s developer tools (F12), go to the Network tab, make the request, then right-click it and choose "Copy" > "Copy as cURL". Paste the result into this tool.',
+    faq2Q: 'Which curl options are supported?',
+    faq2A: 'This tool understands the options browsers actually generate: the URL, -X/--request, -H/--header, -d/--data and its variants, -F/--form for multipart uploads, -b/--cookie, -u/--user for basic auth, -G/--get, -A/--user-agent, and multi-line commands with backslash continuations.',
+    faq3Q: 'Is my curl command sent to a server?',
+    faq3A: 'No. Parsing and code generation both happen locally in your browser with JavaScript — nothing is uploaded anywhere. This matters since curl commands often contain auth tokens or cookies.',
+    footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service'
+  },
+  zh: {
+    inputLabel: 'curl 命令', copy: '复制', copied: '已复制', invalid: '在该命令中未找到网址',
+    seoH1: 'Curl 命令转代码工具',
+    seoIntro: '粘贴从浏览器网络面板复制的 curl 命令，即可获得您所选语言的等效代码。全部在您的浏览器中完成。',
+    seoToggle: '常见问题', faqH2: '常见问题',
+    faq1Q: '如何从浏览器复制请求为 curl 命令？',
+    faq1A: '打开浏览器开发者工具（F12），进入网络（Network）面板，发起请求后右键点击该请求，选择"复制">"复制为 cURL"，然后粘贴到本工具中。',
+    faq2Q: '支持哪些 curl 选项？',
+    faq2A: '本工具支持浏览器实际生成的选项：网址、-X/--request、-H/--header、-d/--data 及其变体、用于多部分上传的 -F/--form、-b/--cookie、用于基本认证的 -u/--user、-G/--get、-A/--user-agent，以及带反斜杠续行的多行命令。',
+    faq3Q: '我的 curl 命令会被发送到服务器吗？',
+    faq3A: '不会。解析和代码生成都通过 JavaScript 在您的浏览器本地完成——不会上传到任何地方。由于 curl 命令中常包含认证令牌或 Cookie，这一点很重要。',
+    footerPrivacy: '隐私政策', footerTerms: '服务条款'
+  },
+  ja: {
+    inputLabel: 'curl コマンド', copy: 'コピー', copied: 'コピーしました', invalid: 'このコマンドに URL が見つかりません',
+    seoH1: 'Curl コマンド → コード変換ツール',
+    seoIntro: 'ブラウザのネットワークタブからコピーした curl コマンドを貼り付けると、お好みの言語の等価なコードが得られます。すべてブラウザ内で完結します。',
+    seoToggle: 'よくある質問', faqH2: 'よくある質問',
+    faq1Q: 'ブラウザからリクエストを curl としてコピーするには？',
+    faq1A: 'ブラウザの開発者ツール（F12）を開き、ネットワークタブでリクエストを実行した後、右クリックして「コピー」>「Copy as cURL」を選択してください。結果をこのツールに貼り付けます。',
+    faq2Q: 'どの curl オプションに対応していますか？',
+    faq2A: 'ブラウザが実際に生成するオプションに対応しています：URL、-X/--request、-H/--header、-d/--data とそのバリエーション、マルチパートアップロード用の -F/--form、-b/--cookie、Basic認証用の -u/--user、-G/--get、-A/--user-agent、バックスラッシュ継続を含む複数行コマンドなどです。',
+    faq3Q: '入力した curl コマンドはサーバーに送信されますか？',
+    faq3A: 'いいえ。解析とコード生成はすべて JavaScript を使ってブラウザ内で完結しており、どこにもアップロードされません。curl コマンドには認証トークンやCookieが含まれることが多いため、これは重要な点です。',
+    footerPrivacy: 'プライバシーポリシー', footerTerms: '利用規約'
+  },
+  ko: {
+    inputLabel: 'curl 명령어', copy: '복사', copied: '복사됨', invalid: '이 명령어에서 URL을 찾을 수 없어요',
+    seoH1: 'Curl 명령어 → 코드 변환기',
+    seoIntro: '브라우저 네트워크 탭에서 복사한 curl 명령어를 붙여넣으면, 원하는 언어로 된 동일한 코드를 얻을 수 있어요. 전부 브라우저 안에서 처리됩니다.',
+    seoToggle: 'FAQ', faqH2: '자주 묻는 질문',
+    faq1Q: '브라우저에서 요청을 curl로 복사하려면 어떻게 하나요?',
+    faq1A: '브라우저 개발자도구(F12)를 열고 Network 탭에서 요청을 실행한 뒤, 해당 요청을 우클릭해서 "Copy" > "Copy as cURL"을 선택하세요. 그 결과를 이 도구에 붙여넣으면 돼요.',
+    faq2Q: '어떤 curl 옵션을 지원하나요?',
+    faq2A: '브라우저가 실제로 생성하는 옵션들을 지원해요: URL, -X/--request, -H/--header, -d/--data와 그 변형들, 멀티파트 업로드용 -F/--form, -b/--cookie, 기본 인증용 -u/--user, -G/--get, -A/--user-agent, 그리고 백슬래시로 이어진 여러 줄 명령어까지요.',
+    faq3Q: '입력한 curl 명령어가 서버로 전송되나요?',
+    faq3A: '아니요. 파싱과 코드 생성 모두 JavaScript로 브라우저 안에서만 처리되고, 어디에도 업로드되지 않아요. curl 명령어에는 인증 토큰이나 쿠키가 자주 포함되기 때문에 이 부분이 중요해요.',
+    footerPrivacy: '개인정보처리방침', footerTerms: '이용약관'
+  }
+};
+
+function t(){ return translations[uiLang]; }
+
+function applyLanguage(lang){
+  uiLang = lang;
+  document.documentElement.lang = lang;
+  const dict = t();
+  inputLabel.textContent = dict.inputLabel;
+  copyBtn.textContent = dict.copy;
+  seoH1.textContent = dict.seoH1;
+  seoIntro.textContent = dict.seoIntro;
+  seoToggle.textContent = dict.seoToggle;
+  faqH2.textContent = dict.faqH2;
+  faq1Q.textContent = dict.faq1Q; faq1A.textContent = dict.faq1A;
+  faq2Q.textContent = dict.faq2Q; faq2A.textContent = dict.faq2A;
+  faq3Q.textContent = dict.faq3Q; faq3A.textContent = dict.faq3A;
+  footerPrivacy.textContent = dict.footerPrivacy;
+  footerTerms.textContent = dict.footerTerms;
+  updateOutput();
+}
+
+uiLangSelect.addEventListener('change', (e) => {
+  applyLanguage(e.target.value);
+  DevWrightSite.saveSharedLang(e.target.value);
+});
+
+function looksLikeUrl(s) {
+  if (!s) return false;
+  // Accept scheme://host, //host (protocol-relative), or bare host.tld forms.
+  // Reject plain words (no dot, no scheme, contains no '/' or '.').
+  if (/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(s)) return true;
+  if (/^\/\//.test(s)) return true;
+  if (/^[\w.-]+\.[a-zA-Z]{2,}(\/|$|:)/.test(s)) return true;
+  return false;
+}
+
+function updateOutput(){
+  const raw = curlInput.value.trim();
+  if(!raw){
+    outputCode.textContent = '—';
+    errorText.style.display = 'none';
+    return;
+  }
+  try {
+    const req = parseCurlCommand(raw);
+    if(!req.url || !looksLikeUrl(req.url)){
+      errorText.textContent = t().invalid;
+      errorText.style.display = 'block';
+      outputCode.textContent = '—';
+      return;
+    }
+    errorText.style.display = 'none';
+    outputCode.textContent = GENERATORS[currentLangKey](req);
+  } catch(e) {
+    errorText.textContent = t().invalid;
+    errorText.style.display = 'block';
+    outputCode.textContent = '—';
+  }
+}
+
+curlInput.addEventListener('input', updateOutput);
+
+langTabs.addEventListener('click', (e) => {
+  const btn = e.target.closest('.lang-tab');
+  if(!btn) return;
+  langTabs.querySelectorAll('.lang-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentLangKey = btn.dataset.lang;
+  updateOutput();
+});
+
+copyBtn.addEventListener('click', async () => {
+  if(outputCode.textContent === '—') return;
+  const ok = await DevWrightSite.copyTextToClipboard(outputCode.textContent);
+  if(ok){
+    const original = copyBtn.textContent;
+    copyBtn.textContent = t().copied;
+    setTimeout(() => { copyBtn.textContent = original; }, 1200);
+  }
+});
+
+function initPage(){
+  if(typeof DevWrightSite === 'undefined'){
+    setTimeout(initPage, 20);
+    return;
+  }
+  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+  const appLayoutEl = document.querySelector('.app-layout');
+  DevWrightSite.setupThemeToggle(themeToggle, 'light');
+  DevWrightSite.setupSidebar(sidebarToggleBtn, appLayoutEl);
+  const initialLang = DevWrightSite.getSharedLang('en');
+  uiLangSelect.value = initialLang;
+  applyLanguage(initialLang);
+
+  // Prefill with a representative example so the tool isn't empty on first load
+  curlInput.value = `curl 'https://api.example.com/users' \\
+  -X POST \\
+  -H 'content-type: application/json' \\
+  -H 'authorization: Bearer YOUR_TOKEN' \\
+  --data-raw '{"name":"Ada Lovelace","role":"engineer"}'`;
+  updateOutput();
+}
+initPage();
+</script>
+</body>
+</html>

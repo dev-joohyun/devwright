@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Online Hash Generator (MD5, SHA-1, SHA-256, SHA-512)</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%F0%9F%94%A8</text></svg>">
+<meta name="description" content="Generate MD5, SHA-1, SHA-256, SHA-384, and SHA-512 hashes of any text instantly in your browser. Free, no signup, nothing leaves your device.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://dev-joohyun.github.io/devwright/hash-generator.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<link rel="stylesheet" href="site.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DevWright Hash Generator",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any (Web browser)",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free online tool to generate MD5, SHA-1, SHA-256, SHA-384, and SHA-512 hashes of any text."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is MD5 safe to use?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. MD5 is considered cryptographically broken and should not be used for security purposes like password storage. It's included here for checksums and compatibility with legacy systems only." }
+    },
+    {
+      "@type": "Question",
+      "name": "Which hash should I use for passwords?",
+      "acceptedAnswer": { "@type": "Answer", "text": "None of these on their own. Passwords should be hashed with a dedicated, slow algorithm designed for that purpose (like bcrypt, scrypt, or Argon2), not a general-purpose hash like SHA-256." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my text uploaded anywhere?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Every hash is computed locally in your browser — nothing is sent to a server." }
+    }
+  ]
+}
+</script>
+<style>
+  main{ flex:1; display:flex; flex-direction:column; max-width:760px; margin:0 auto; width:100%; padding:32px 24px; gap:20px; }
+  h1{ font-size:18px; margin:0; }
+  .intro{ color:var(--muted); font-size:13px; margin:0; line-height:1.6; }
+
+  .field-label{ font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px; }
+  textarea{
+    width:100%; min-height:120px; resize:vertical; border:1px solid var(--line); border-radius:8px;
+    background:var(--panel); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:13.5px;
+    line-height:1.6; padding:14px 16px; overflow:auto;
+  }
+  textarea:focus{ outline:none; border-color:var(--border-hover); }
+
+  .hash-list{ display:flex; flex-direction:column; gap:10px; }
+  .hash-row{
+    display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:8px;
+    padding:10px 14px; background:var(--panel);
+  }
+  .hash-name{ width:70px; flex-shrink:0; font-size:12px; font-weight:700; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+  .hash-value{ flex:1; font-size:12.5px; word-break:break-all; color:var(--text); min-width:0; font-family:'JetBrains Mono',monospace; }
+  .hash-value.empty{ color:var(--muted); }
+  /* overrides the shared .icon-btn from site.css with a tighter size for hash rows */
+  .icon-btn{
+    font-size:11.5px; padding:6px 12px;
+    flex-shrink:0;
+  }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand"><a href="index.html"><span class="brand-mark">DevWright</span></a></div>
+    <div class="sidebar-group-label">Format</div>
+    <a href="code-formatter.html" class="sidebar-link">Code Formatter</a>
+    <a href="yaml-json.html" class="sidebar-link">YAML ↔ JSON</a>
+    <div class="sidebar-group-label">Encode / Decode</div>
+    <a href="base64-tool.html" class="sidebar-link">Base64</a>
+    <a href="url-encoder.html" class="sidebar-link">URL Encoder</a>
+    <a href="jwt-decoder.html" class="sidebar-link">JWT Decoder</a>
+    <div class="sidebar-group-label">Generate</div>
+    <a href="hash-generator.html" class="sidebar-link active" aria-current="page">Hash Generator</a>
+    <a href="uuid-generator.html" class="sidebar-link">UUID Generator</a>
+    <div class="sidebar-group-label">Convert</div>
+    <a href="unix-timestamp.html" class="sidebar-link">Unix Timestamp</a>
+    <a href="color-converter.html" class="sidebar-link">Color Converter</a>
+    <a href="curl-converter.html" class="sidebar-link">Curl Converter</a>
+    <div class="sidebar-group-label">Test</div>
+    <a href="regex-tester.html" class="sidebar-link">Regex Tester</a>
+  </aside>
+
+  <div class="content-col">
+<header>
+  <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle sidebar" title="Collapse sidebar">☰</button>
+  <div class="header-settings">
+    <select class="lang-select" id="uiLangSelect">
+      <option value="en">English</option>
+      <option value="zh">中文</option>
+      <option value="ja">日本語</option>
+      <option value="ko">한국어</option>
+    </select>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" title="Toggle theme">🌙</button>
+  </div>
+</header>
+
+<main>
+  <h1 id="seoH1">Free Online Hash Generator</h1>
+  <p class="intro" id="seoIntro">Type or paste text below to instantly generate its MD5, SHA-1, SHA-256, SHA-384, and SHA-512 hashes. Runs entirely in your browser — nothing is uploaded.</p>
+
+  <div>
+    <div class="field-label" id="textLabel">Text</div>
+    <textarea id="inputArea" placeholder="Type or paste text here..."></textarea>
+  </div>
+
+  <div class="hash-list" id="hashList">
+    <div class="hash-row"><span class="hash-name">MD5</span><span class="hash-value empty" id="hash-md5">—</span><button class="icon-btn" data-target="hash-md5" id="copy-md5">Copy</button></div>
+    <div class="hash-row"><span class="hash-name">SHA-1</span><span class="hash-value empty" id="hash-sha1">—</span><button class="icon-btn" data-target="hash-sha1" id="copy-sha1">Copy</button></div>
+    <div class="hash-row"><span class="hash-name">SHA-256</span><span class="hash-value empty" id="hash-sha256">—</span><button class="icon-btn" data-target="hash-sha256" id="copy-sha256">Copy</button></div>
+    <div class="hash-row"><span class="hash-name">SHA-384</span><span class="hash-value empty" id="hash-sha384">—</span><button class="icon-btn" data-target="hash-sha384" id="copy-sha384">Copy</button></div>
+    <div class="hash-row"><span class="hash-name">SHA-512</span><span class="hash-value empty" id="hash-sha512">—</span><button class="icon-btn" data-target="hash-sha512" id="copy-sha512">Copy</button></div>
+  </div>
+
+  <details class="seo-more">
+    <summary id="seoToggle">FAQ</summary>
+    <h2 id="faqH2">Frequently asked questions</h2>
+    <details><summary id="faq1Q">Is MD5 safe to use?</summary><p id="faq1A">No. MD5 is considered cryptographically broken and should not be used for security purposes like password storage. It's included here for checksums and compatibility with legacy systems only.</p></details>
+    <details><summary id="faq2Q">Which hash should I use for passwords?</summary><p id="faq2A">None of these on their own. Passwords should be hashed with a dedicated, slow algorithm designed for that purpose (like bcrypt, scrypt, or Argon2), not a general-purpose hash like SHA-256.</p></details>
+    <details><summary id="faq3Q">Is my text uploaded anywhere?</summary><p id="faq3A">No. Every hash is computed locally in your browser — nothing is sent to a server.</p></details>
+  </details>
+</main>
+
+<div class="site-footer">
+  <span id="footerCopyright">© 2026 DevWright</span>
+  <a href="index.html#privacy" id="footerPrivacy">Privacy Policy</a>
+  <a href="index.html#terms" id="footerTerms">Terms of Service</a>
+</div>
+
+  </div>
+</div>
+
+<script src="site.js"></script>
+<script>
+  const inputArea = document.getElementById('inputArea');
+  const hashList = document.getElementById('hashList');
+  const themeToggle = document.getElementById('themeToggle');
+  const uiLangSelect = document.getElementById('uiLangSelect');
+
+  const seoH1 = document.getElementById('seoH1');
+  const seoIntro = document.getElementById('seoIntro');
+  const textLabel = document.getElementById('textLabel');
+  const seoToggle = document.getElementById('seoToggle');
+  const faqH2 = document.getElementById('faqH2');
+  const faq1Q = document.getElementById('faq1Q'), faq1A = document.getElementById('faq1A');
+  const faq2Q = document.getElementById('faq2Q'), faq2A = document.getElementById('faq2A');
+  const faq3Q = document.getElementById('faq3Q'), faq3A = document.getElementById('faq3A');
+  const footerPrivacy = document.getElementById('footerPrivacy');
+  const footerTerms = document.getElementById('footerTerms');
+  const copyBtns = ['copy-md5','copy-sha1','copy-sha256','copy-sha384','copy-sha512'].map(id => document.getElementById(id));
+
+  let uiLang = 'en';
+
+  const translations = {
+    en: {
+      textLabel: 'Text', copy: 'Copy', copied: 'Copied',
+      seoH1: 'Free Online Hash Generator',
+      seoIntro: 'Type or paste text below to instantly generate its MD5, SHA-1, SHA-256, SHA-384, and SHA-512 hashes. Runs entirely in your browser — nothing is uploaded.',
+      seoToggle: 'FAQ',
+      faqH2: 'Frequently asked questions',
+      faq1Q: 'Is MD5 safe to use?',
+      faq1A: "No. MD5 is considered cryptographically broken and should not be used for security purposes like password storage. It's included here for checksums and compatibility with legacy systems only.",
+      faq2Q: 'Which hash should I use for passwords?',
+      faq2A: 'None of these on their own. Passwords should be hashed with a dedicated, slow algorithm designed for that purpose (like bcrypt, scrypt, or Argon2), not a general-purpose hash like SHA-256.',
+      faq3Q: 'Is my text uploaded anywhere?',
+      faq3A: 'No. Every hash is computed locally in your browser — nothing is sent to a server.',
+      footerPrivacy: 'Privacy Policy', footerTerms: 'Terms of Service'
+    },
+    zh: {
+      textLabel: '文本', copy: '复制', copied: '已复制',
+      seoH1: '免费在线哈希生成器',
+      seoIntro: '在下方输入或粘贴文本，即可立即生成其 MD5、SHA-1、SHA-256、SHA-384 和 SHA-512 哈希值。全部在您的浏览器中完成——不会上传任何内容。',
+      seoToggle: '常见问题',
+      faqH2: '常见问题',
+      faq1Q: 'MD5 安全吗？',
+      faq1A: '不安全。MD5 在密码学上已被认为是不安全的，不应用于密码存储等安全用途。这里提供 MD5 仅用于校验和以及兼容旧系统。',
+      faq2Q: '密码应该用哪种哈希？',
+      faq2A: '以上这些都不应单独使用。密码应使用专门为此设计的慢速算法（如 bcrypt、scrypt 或 Argon2）进行哈希，而不是 SHA-256 这类通用哈希。',
+      faq3Q: '我的文本会被上传吗？',
+      faq3A: '不会。所有哈希计算都在您的浏览器本地完成——不会发送到任何服务器。',
+      footerPrivacy: '隐私政策', footerTerms: '服务条款'
+    },
+    ja: {
+      textLabel: 'テキスト', copy: 'コピー', copied: 'コピーしました',
+      seoH1: '無料オンライン ハッシュ生成ツール',
+      seoIntro: '下にテキストを入力または貼り付けると、MD5・SHA-1・SHA-256・SHA-384・SHA-512 のハッシュ値がすぐに生成されます。すべてブラウザ内で完結し、アップロードは一切ありません。',
+      seoToggle: 'よくある質問',
+      faqH2: 'よくある質問',
+      faq1Q: 'MD5 は安全に使えますか？',
+      faq1A: 'いいえ。MD5 は暗号学的に安全ではないとされており、パスワード保存などのセキュリティ用途には使うべきではありません。ここではチェックサムやレガシーシステムとの互換性のためだけに提供しています。',
+      faq2Q: 'パスワードにはどのハッシュを使えばいいですか？',
+      faq2A: 'これらのどれも単体では使うべきではありません。パスワードは bcrypt、scrypt、Argon2 のような専用の低速アルゴリズムでハッシュ化すべきで、SHA-256 のような汎用ハッシュは適していません。',
+      faq3Q: '入力したテキストはアップロードされますか？',
+      faq3A: 'いいえ。すべてのハッシュ計算はブラウザ内でローカルに行われ、サーバーには送信されません。',
+      footerPrivacy: 'プライバシーポリシー', footerTerms: '利用規約'
+    },
+    ko: {
+      textLabel: '텍스트', copy: '복사', copied: '복사됨',
+      seoH1: '무료 온라인 해시 생성기',
+      seoIntro: '아래에 텍스트를 입력하거나 붙여넣으면 MD5, SHA-1, SHA-256, SHA-384, SHA-512 해시를 바로 생성해줘요. 전부 브라우저 안에서 처리되고 어디에도 업로드되지 않습니다.',
+      seoToggle: 'FAQ',
+      faqH2: '자주 묻는 질문',
+      faq1Q: 'MD5는 안전한가요?',
+      faq1A: '아니요. MD5는 암호학적으로 취약하다고 알려져 있어서 비밀번호 저장 같은 보안 목적으로 쓰면 안 돼요. 여기서는 체크섬이나 레거시 시스템 호환용으로만 제공해요.',
+      faq2Q: '비밀번호는 어떤 해시를 써야 하나요?',
+      faq2A: '이 중 어느 것도 단독으로는 안 돼요. 비밀번호는 bcrypt, scrypt, Argon2처럼 그 용도로 설계된 느린 전용 알고리즘으로 해싱해야지, SHA-256 같은 범용 해시는 적합하지 않아요.',
+      faq3Q: '입력한 텍스트가 업로드되나요?',
+      faq3A: '아니요. 모든 해시 계산은 브라우저 안에서 로컬로 이루어지고, 서버로는 아무것도 전송되지 않아요.',
+      footerPrivacy: '개인정보처리방침', footerTerms: '이용약관'
+    }
+  };
+
+  function t(){ return translations[uiLang]; }
+
+  function applyLanguage(lang){
+    uiLang = lang;
+    document.documentElement.lang = lang;
+    const dict = t();
+    textLabel.textContent = dict.textLabel;
+    copyBtns.forEach(btn => { btn.textContent = dict.copy; });
+    seoH1.textContent = dict.seoH1;
+    seoIntro.textContent = dict.seoIntro;
+    seoToggle.textContent = dict.seoToggle;
+    faqH2.textContent = dict.faqH2;
+    faq1Q.textContent = dict.faq1Q; faq1A.textContent = dict.faq1A;
+    faq2Q.textContent = dict.faq2Q; faq2A.textContent = dict.faq2A;
+    faq3Q.textContent = dict.faq3Q; faq3A.textContent = dict.faq3A;
+    footerPrivacy.textContent = dict.footerPrivacy;
+    footerTerms.textContent = dict.footerTerms;
+  }
+
+  uiLangSelect.addEventListener('change', (e) => {
+    applyLanguage(e.target.value);
+    DevWrightSite.saveSharedLang(e.target.value);
+  });
+
+  function md5(input){
+    function rotl(x, c){ return (x << c) | (x >>> (32 - c)); }
+    function toBytesUtf8(str){ return new TextEncoder().encode(str); }
+
+    const s = [7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,
+               5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,
+               4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,
+               6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21];
+    const K = new Int32Array(64);
+    for(let i = 0; i < 64; i++) K[i] = (Math.floor(Math.abs(Math.sin(i + 1)) * 4294967296)) | 0;
+
+    const bytes = toBytesUtf8(input);
+    const bitLen = bytes.length * 8;
+    const withOne = new Uint8Array(((bytes.length + 8) >> 6) * 64 + 64);
+    withOne.set(bytes);
+    withOne[bytes.length] = 0x80;
+    const totalLen = withOne.length;
+    const view = new DataView(withOne.buffer);
+    view.setUint32(totalLen - 8, bitLen >>> 0, true);
+    view.setUint32(totalLen - 4, Math.floor(bitLen / 4294967296), true);
+
+    let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+
+    for(let chunkStart = 0; chunkStart < totalLen; chunkStart += 64){
+      const M = new Int32Array(16);
+      for(let i = 0; i < 16; i++) M[i] = view.getInt32(chunkStart + i * 4, true);
+      let A = a0, B = b0, C = c0, D = d0;
+      for(let i = 0; i < 64; i++){
+        let F, g;
+        if(i < 16){ F = (B & C) | (~B & D); g = i; }
+        else if(i < 32){ F = (D & B) | (~D & C); g = (5 * i + 1) % 16; }
+        else if(i < 48){ F = B ^ C ^ D; g = (3 * i + 5) % 16; }
+        else { F = C ^ (B | ~D); g = (7 * i) % 16; }
+        F = (F + A + K[i] + M[g]) | 0;
+        A = D; D = C; C = B;
+        B = (B + rotl(F, s[i])) | 0;
+      }
+      a0 = (a0 + A) | 0; b0 = (b0 + B) | 0; c0 = (c0 + C) | 0; d0 = (d0 + D) | 0;
+    }
+
+    function toHexLE(n){
+      const bytes = [n & 0xff, (n >>> 8) & 0xff, (n >>> 16) & 0xff, (n >>> 24) & 0xff];
+      return bytes.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    return toHexLE(a0) + toHexLE(b0) + toHexLE(c0) + toHexLE(d0);
+  }
+
+  async function sha(algo, input){
+    const bytes = new TextEncoder().encode(input);
+    const digest = await crypto.subtle.digest(algo, bytes);
+    return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function setHash(id, value){
+    const el = document.getElementById(id);
+    el.textContent = value;
+    el.classList.toggle('empty', !value);
+  }
+
+  async function updateHashes(){
+    const input = inputArea.value;
+    if(!input){
+      ['hash-md5','hash-sha1','hash-sha256','hash-sha384','hash-sha512'].forEach(id => { document.getElementById(id).textContent = '—'; document.getElementById(id).classList.add('empty'); });
+      return;
+    }
+    setHash('hash-md5', md5(input));
+    setHash('hash-sha1', await sha('SHA-1', input));
+    setHash('hash-sha256', await sha('SHA-256', input));
+    setHash('hash-sha384', await sha('SHA-384', input));
+    setHash('hash-sha512', await sha('SHA-512', input));
+  }
+
+  inputArea.addEventListener('input', updateHashes);
+
+  hashList.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.icon-btn');
+    if(!btn) return;
+    const value = document.getElementById(btn.dataset.target).textContent;
+    if(!value || value === '—') return;
+    const ok = await DevWrightSite.copyTextToClipboard(value);
+    if(ok){
+      const original = btn.textContent;
+      btn.textContent = t().copied;
+      setTimeout(() => { btn.textContent = original; }, 1200);
+    }
+  });
+
+  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+  const appLayoutEl = document.querySelector('.app-layout');
+  DevWrightSite.setupThemeToggle(themeToggle, 'light');
+  DevWrightSite.setupSidebar(sidebarToggleBtn, appLayoutEl);
+  const initialLang = DevWrightSite.getSharedLang('en');
+  uiLangSelect.value = initialLang;
+  applyLanguage(initialLang);
+</script>
+</body>
+</html>
