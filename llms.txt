@@ -1,0 +1,31 @@
+# DevWright
+
+> DevWright is a free, browser-only collection of developer utilities. Every tool runs entirely client-side — nothing pasted into a tool is ever uploaded or sent to a server. No account, signup, or file upload is required.
+
+## Tools
+
+- [Code Formatter](https://dev-joohyun.github.io/devwright/code-formatter.html): Format, minify, and validate JSON, HTML, JavaScript, and CSS.
+- [YAML ⇄ JSON Converter](https://dev-joohyun.github.io/devwright/yaml-json.html): Convert between YAML and JSON instantly.
+- [Base64 Encoder & Decoder](https://dev-joohyun.github.io/devwright/base64-tool.html): Encode or decode Base64 text.
+- [URL Encoder & Decoder](https://dev-joohyun.github.io/devwright/url-encoder.html): Percent-encode or decode URLs.
+- [JWT Decoder](https://dev-joohyun.github.io/devwright/jwt-decoder.html): Decode a JWT's header and payload.
+- [Hash Generator](https://dev-joohyun.github.io/devwright/hash-generator.html): Generate MD5, SHA-1, SHA-256, SHA-384, and SHA-512 hashes of any text.
+- [UUID / ULID Generator](https://dev-joohyun.github.io/devwright/uuid-generator.html): Generate UUID v4 or ULID identifiers in bulk.
+- [Unix Timestamp Converter](https://dev-joohyun.github.io/devwright/unix-timestamp.html): Convert Unix timestamps to human-readable dates and back.
+- [Color Converter](https://dev-joohyun.github.io/devwright/color-converter.html): Convert colors between HEX, RGB, and HSL.
+- [Curl to Code Converter](https://dev-joohyun.github.io/devwright/curl-converter.html): Convert a curl command into Python, JavaScript, Node.js, PHP, Go, Java, Ruby, C#, PowerShell, or Rust code.
+- [Regex Tester](https://dev-joohyun.github.io/devwright/regex-tester.html): Test regular expressions against sample text with live match highlighting.
+
+## Languages
+
+DevWright's homepage is available in four languages, each at its own URL:
+
+- [English](https://dev-joohyun.github.io/devwright/)
+- [한국어](https://dev-joohyun.github.io/devwright/ko/)
+- [日本語](https://dev-joohyun.github.io/devwright/ja/)
+- [中文](https://dev-joohyun.github.io/devwright/zh/)
+
+## Notes
+
+- All processing happens locally in the browser using standard Web APIs; no user input is ever transmitted to a server.
+- The site has no build step and no backend — every page is a self-contained static HTML file.
